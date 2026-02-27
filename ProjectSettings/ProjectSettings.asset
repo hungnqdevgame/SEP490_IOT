@@ -821,7 +821,8 @@ PlayerSettings:
   webGLWebAssemblyBigInt: 0
   webGLCloseOnQuit: 0
   webWasm2023: 0
-  scriptingDefineSymbols: {}
+  scriptingDefineSymbols:
+    Standalone: STARTER_ASSETS_PACKAGES_CHECKED
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:
@@ -930,6 +931,6 @@ PlayerSettings:
   hmiLoadingImage: {fileID: 0}
   platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
-  insecureHttpOption: 0
+  insecureHttpOption: 2
   androidVulkanDenyFilterList: []
   androidVulkanAllowFilterList: []
