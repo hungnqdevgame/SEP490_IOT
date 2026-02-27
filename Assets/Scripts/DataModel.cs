@@ -45,3 +45,11 @@ public class CategoryItem
     public string code;
     public string name;
 }
+
+[System.Serializable]
+public class ModelPlaylistItem
+{
+    public string modelUrl;       // Đường dẫn đến file robot hoặc .glb trên Render
+    public string assetName;      // Tên Prefab (ví dụ: KyleRobot)
+    public float displayDuration; // Thời gian hiển thị (giây)
+}

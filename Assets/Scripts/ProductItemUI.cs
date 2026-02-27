@@ -6,32 +6,94 @@ using UnityEngine.UI;
 
 public class ProductItemUI : MonoBehaviour
 {
-    [Header("UI Components")]
-    public RawImage productImage;       
-    public TextMeshProUGUI nameText;   
-    
+    [Header("Core UI Components")]
+    public RawImage productImage;
+    public TextMeshProUGUI nameText;
+
+    [Header("Multi-Select Components")]
+    public GameObject checkboxObject;   // Cái khung của ô tích (ví dụ: hình tròn)
+    public Toggle selectionToggle;      // Thành phần Toggle để bắt sự kiện Click
+    public Button showButton; 
+    // Nút "Show" hiện tại của bạn
+
+    private ProductItem currentItem;    // Lưu trữ data của sản phẩm hiện tại
+    private SelectionManager manager; // Quản lý tổng việc chọn nhiều
+
+    private void Start()
+    {
+        // Tìm manager trong Scene để báo cáo mỗi khi được tích chọn
+        manager = FindFirstObjectByType<SelectionManager>();
+        selectionToggle.gameObject.SetActive(false); // Ẩn Toggle ban đầu
+        // Lắng nghe sự kiện khi người dùng tích vào ô
+        if (selectionToggle != null)
+        {
+            selectionToggle.onValueChanged.AddListener(OnToggleChanged);
+        }
+
+    }
 
     public void DisplayProduct(ProductItem item)
     {
-        // 1. Hiện panel lên (phòng trường hợp nó đang bị ẩn)
+        currentItem = item; // Lưu lại data để dùng khi chọn
         gameObject.SetActive(true);
-
-        // 2. Gán Text
         nameText.text = item.name;
-        
 
-        // 3. Tải ảnh
         if (!string.IsNullOrEmpty(item.imageUrl) && item.imageUrl != "string")
         {
             StartCoroutine(DownloadImage(item.imageUrl));
         }
         else
         {
-            productImage.color = Color.gray; // Màu mặc định nếu không có ảnh
+            productImage.color = Color.gray;
+        }
+
+        // Mặc định khi mới hiện ra thì không ở chế độ chọn nhiều
+        SetMultiSelectMode(false);
+    }
+
+    // --- LOGIC CHỌN NHIỀU BẠN CẦN CHÈN ---
+
+    public void SetMultiSelectMode(bool isActive)
+    {
+        // Ẩn/Hiện ô Checkbox/Toggle dựa trên biến isActive
+        if (checkboxObject != null)
+            checkboxObject.SetActive(isActive);
+
+        // Ngược lại, nút Show sẽ ẩn khi Toggle hiện và ngược lại
+        if (showButton != null)
+            showButton.gameObject.SetActive(!isActive);
+
+        // Reset lại trạng thái tích về false khi tắt chế độ chọn nhiều
+        if (!isActive && selectionToggle != null)
+        {
+            selectionToggle.isOn = false;
+            selectionToggle.gameObject.SetActive(false);
+        }
+        else selectionToggle.gameObject.SetActive(true);
+
+
+
+
+    }
+
+    private void OnToggleChanged(bool isOn)
+    {
+        if (manager != null && currentItem != null)
+        {
+            // Chuyển data từ ProductItem sang dạng Playlist để phát
+            ModelPlaylistItem playlistData = new ModelPlaylistItem
+            {
+                modelUrl = currentItem.model3DUrl, // Đảm bảo ProductItem có trường này từ API
+                assetName = currentItem.name,
+                displayDuration = 5.0f // Thời gian mặc định
+            };
+            Debug.Log($"Toggle changed: {isOn} for {currentItem.name}");
+            manager.UpdateSelection(playlistData, isOn);
         }
     }
 
-    // Hàm này dùng để ẩn Panel nếu API trả về ít hơn 4 món
+    // ------------------------------------
+
     public void Hide()
     {
         gameObject.SetActive(false);
@@ -49,7 +111,4 @@ public class ProductItemUI : MonoBehaviour
             }
         }
     }
-
-   
-    
 }

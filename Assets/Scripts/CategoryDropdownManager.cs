@@ -1,4 +1,4 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -13,12 +13,12 @@ public class CategoryDropdownManager : MonoBehaviour
     public TMP_Dropdown categoryDropdown;
     public ProductManager productListManager; // Tham chi?u ??n script qu?n l? s?n ph?m
 
-    // List n®§y d®¥ng ?? map t? Index c?a Dropdown sang ID th?t c?a Category
+    // List n√†y d√πng ?? map t? Index c?a Dropdown sang ID th?t c?a Category
     private List<string> _categoryIds = new List<string>();
 
     void Start()
     {
-        // 1. ??ng k? s? ki?n khi ng??i d®¥ng thay ??i l?a ch?n
+        // 1. ??ng k? s? ki?n khi ng??i d√πng thay ??i l?a ch?n
         categoryDropdown.onValueChanged.AddListener(OnCategoryChanged);
 
         // 2. T?i d? li?u
@@ -51,22 +51,23 @@ public class CategoryDropdownManager : MonoBehaviour
         categoryDropdown.ClearOptions();
         _categoryIds.Clear();
 
-        // --- OPTION 1: Th®∫m l?a ch?n "T?t c?" ? ??u ---
+        // --- OPTION 1: Th√™m l?a ch?n "T?t c?" ? ??u ---
         var options = new List<TMP_Dropdown.OptionData>();
-        options.Add(new TMP_Dropdown.OptionData("T?t c? s?n ph?m"));
-        _categoryIds.Add(""); // ID r?ng ngh?a l®§ l?y t?t c?
+        options.Add(new TMP_Dropdown.OptionData("T·∫•t c·∫£ s·∫£ ph·∫©m"));
+        _categoryIds.Add(""); // ID r?ng ngh?a l√† l?y t?t c?
 
-        // --- OPTION 2: Th®∫m c®¢c category t? API ---
+        // --- OPTION 2: Th√™m c√°c category t? API ---
         foreach (var cat in categories)
         {
             options.Add(new TMP_Dropdown.OptionData(cat.name));
-            _categoryIds.Add(cat.id); // L?u ID v®§o list song song
+            _categoryIds.Add(cat.id); // L?u ID v√†o list song song
+            
         }
 
         categoryDropdown.AddOptions(options);
     }
 
-    // H®§m n®§y ch?y khi ng??i d®¥ng ch?n Dropdown
+   
     public void OnCategoryChanged(int index)
     {
         // L?y ID t??ng ?ng v?i index ???c ch?n
@@ -74,7 +75,7 @@ public class CategoryDropdownManager : MonoBehaviour
 
         Debug.Log($"?? ch?n: Index {index} - ID: {selectedId}");
 
-        // G?i sang ProductManager ?? t?i l?i danh s®¢ch s?n ph?m
+        // G?i sang ProductManager ?? t?i l?i danh s√°ch s?n ph?m
         if (productListManager != null)
         {
             productListManager.FilterByCategory(selectedId);

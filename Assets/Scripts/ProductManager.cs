@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NUnit.Framework.Internal;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,8 +13,11 @@ public class ProductManager : MonoBehaviour
     private string baseUrl = "http://localhost:5035/api/Product/paginated";
     int pageSize = 4;   
     private string currentCategoryId = "";
+    [SerializeField]
     private int currentPage = 1;
     private string currentSearchText = "";
+    public TextMeshProUGUI pageObject;
+
 
     public void FilterByCategory(string categoryId)
     {
@@ -30,7 +34,7 @@ public class ProductManager : MonoBehaviour
         {
             searchInput.onEndEdit.AddListener(OnSearchTermChanged);
         }
-
+        pageObject.text = currentPage.ToString();
         StartCoroutine(GetData());
     }
 
@@ -51,6 +55,7 @@ public class ProductManager : MonoBehaviour
                 {
                     UpdateUI(response.data.items);
                 }
+                Debug.Log("API trả về: " + request.downloadHandler.text); // Debug để xem JSON trả về
             }
             else
             {
@@ -67,7 +72,7 @@ public class ProductManager : MonoBehaviour
             // Kiểm tra: Nếu dữ liệu có đủ cho slot này thì hiện, không thì ẩn
             if (i < items.Count)
             {
-                // Có dữ liệu -> Hiển thị
+                productSlots[i].SetMultiSelectMode(false);
                 productSlots[i].DisplayProduct(items[i]);
             }
             else
@@ -81,7 +86,8 @@ public class ProductManager : MonoBehaviour
     public void LoadPage(int page)
     {
         currentPage = page;
-
+        pageObject.text = page.ToString();
+        Debug.Log($"Đang tải trang {page} với pageSize {pageObject.text} và categoryId '{currentCategoryId}'");
         // Bắt đầu ghép chuỗi URL
         // Kết quả: http://.../paginated?pageNumber=1&pageSize=4
         string finalUrl = $"{baseUrl}?pageNumber={page}&pageSize={pageSize}";
