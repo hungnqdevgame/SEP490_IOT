@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class PanelController : MonoBehaviour
@@ -23,6 +24,7 @@ public class PanelController : MonoBehaviour
     [Header("4. Cài đặt chung")]
     public float smoothSpeed = 5f;    // Tốc độ chuyển động
     public Button toggleButton;       // Nút bấm để kích hoạt (Ví dụ nút "Mua" hoặc một nút tàng hình)
+    public TextMeshProUGUI toggleButtonName;
 
     private bool isExpanded = true;   // Trạng thái hiện tại (Đang mở hay đóng?)
 
@@ -37,6 +39,8 @@ public class PanelController : MonoBehaviour
             modelCamera.transform.rotation = cameraStateOut.rotation;
             modelCamera.fieldOfView = 60f; // FOV mặc định
         }
+        toggleButtonName.text = "Ẩn thông tin";
+
 
     }
 
@@ -88,5 +92,6 @@ public class PanelController : MonoBehaviour
     public void ToggleState()
     {
         isExpanded = !isExpanded;
+        toggleButtonName.text = isExpanded ? "Ẩn thông tin" : "Hiện thông tin"; 
     }
 }

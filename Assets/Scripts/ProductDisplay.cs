@@ -10,9 +10,11 @@ public class ProductDisplay : MonoBehaviour
         {
             Debug.Log("✅ Đã tìm thấy SignalRManager! Đang đăng ký sự kiện...");
             SignalRManager.Instance.OnProductReceived += ShowProduct;
+            SignalRManager.Instance.OnProductRotatedEvent += RotateMyModel;
         }
         else
         {
+            SignalRManager.Instance.OnProductRotatedEvent -= RotateMyModel;
             // NẾU BẠN THẤY DÒNG NÀY TRONG CONSOLE -> ĐÂY LÀ LỖI
             Debug.LogError("❌ LỖI TO: Không tìm thấy SignalRManager.Instance! Script này chạy sớm hơn Manager hoặc Manager chưa được tạo.");
         }
@@ -54,5 +56,13 @@ public class ProductDisplay : MonoBehaviour
             Debug.LogError("Không tìm thấy model có tên: " + productId);
         }
 
+    }
+
+    private void RotateMyModel(float angle)
+    {
+        // Đặt trục Y bằng biến angle, trục X và Z giữ ở mức 0
+        transform.localRotation = Quaternion.Euler(0, transform.rotation.y+angle, 0);
+
+        Debug.Log($"[XOAY] Đã xoay model đến góc Y = {angle}");
     }
 }

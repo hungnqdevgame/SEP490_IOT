@@ -11,13 +11,13 @@ public class SignalRManager : MonoBehaviour
 
 
     // THAY IP NÀY BẰNG IP LAPTOP CỦA BẠN
-    private string serverUrl = "http://10.87.21.29:5035/productHub";
+    public string serverUrl ;
 
     private HubConnection connection;
 
     // Sự kiện để báo cho App Hiển Thị biết
     public event Action<string> OnProductReceived;
-
+    public event Action<float> OnProductRotatedEvent;
     void Awake()
     {
         if (Instance == null)
@@ -62,6 +62,14 @@ public class SignalRManager : MonoBehaviour
             });
         });
 
+        connection.On<float>("OnProductRotated", (angle) =>
+        {
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                // Rút gọn cách gọi hàm (Dấu ? thay cho if != null)
+                OnProductRotatedEvent?.Invoke(angle);
+            });
+        });
         Connect();
     }
 

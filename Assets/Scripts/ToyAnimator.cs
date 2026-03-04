@@ -25,11 +25,11 @@ public class ToyAnimator : MonoBehaviour
         if (toyAnimator == null)
         {
             toyAnimator = FindAnyObjectByType<Animator>();
-            Debug.LogError("Animator chưa được gán! Vui lòng kiểm tra lại.");
+         //   Debug.LogError("Animator chưa được gán! Vui lòng kiểm tra lại.");
         }
         else
         {
-            Debug.Log("Animator đã được gán thành công.");
+       //     Debug.Log("Animator đã được gán thành công.");
         }
     }
     public void ClickToRun()
