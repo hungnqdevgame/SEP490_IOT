@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ProductItemUI : MonoBehaviour
@@ -19,6 +20,7 @@ public class ProductItemUI : MonoBehaviour
 
     private ProductItem currentItem;    // Lưu trữ data của sản phẩm hiện tại
     private SelectionManager manager; // Quản lý tổng việc chọn nhiều
+    public Button btnRemove; 
 
     private void Start()
     {
@@ -30,6 +32,7 @@ public class ProductItemUI : MonoBehaviour
         {
             selectionToggle.onValueChanged.AddListener(OnToggleChanged);
         }
+        
 
     }
 
@@ -46,6 +49,19 @@ public class ProductItemUI : MonoBehaviour
         else
         {
             productImage.color = Color.gray;
+        }
+
+        if (showButton != null)
+        {
+            showButton.onClick.RemoveAllListeners();
+            showButton.onClick.AddListener(() =>
+            {
+                // 1. Cất dữ liệu của sản phẩm này vào "balo" DataBridge
+                DataBridge.selectedProduct = item;
+                Debug.Log($"[MÀN 1] Đã cất vào balo sản phẩm: {DataBridge.selectedProduct.name}");
+                // 2. Chuyển sang Scene 2 (Nhớ gõ ĐÚNG TÊN scene của bạn)
+                SceneManager.LoadScene("Display Product");
+            });
         }
 
         // Mặc định khi mới hiện ra thì không ở chế độ chọn nhiều
