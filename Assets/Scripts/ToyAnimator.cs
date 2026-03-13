@@ -32,19 +32,39 @@ public class ToyAnimator : MonoBehaviour
        //     Debug.Log("Animator đã được gán thành công.");
         }
     }
-    public void ClickToRun()
+    public void SetAni1()
     {
-        toyAnimator.SetTrigger("run_click");
+        ResetAllTriggers();
+        toyAnimator.SetTrigger("ani1");
+        
     }
 
-    public void ClickToIdle()
+    public void SetAni2()
     {
-        toyAnimator.SetTrigger("idle_click");
+        ResetAllTriggers();
+        toyAnimator.SetTrigger("ani2");
     }
 
-    public void ClickToWalk()
+    public void SetAni3()
     {
-        toyAnimator.SetTrigger("walk_click");
+        ResetAllTriggers();
+        toyAnimator.SetTrigger("ani3");
+    }
+
+    public void SetAni4()
+    {
+        ResetAllTriggers();
+        toyAnimator.SetTrigger("ani4");
+    }
+
+    private void ResetAllTriggers()
+    {
+        if (toyAnimator == null) return;
+
+        toyAnimator.ResetTrigger("ani1");
+        toyAnimator.ResetTrigger("ani2");
+        toyAnimator.ResetTrigger("ani3");
+        toyAnimator.ResetTrigger("ani4");
     }
 
 

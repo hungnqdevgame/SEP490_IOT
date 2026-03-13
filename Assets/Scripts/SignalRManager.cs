@@ -88,12 +88,12 @@ public class SignalRManager : MonoBehaviour
 
     // --- PHẦN DÀNH CHO MÁY A (Điều khiển) ---
     // Hàm này được gọi khi bấm nút trên điện thoại A
-    public async Task SendSelectProduct(string productId)
+    public async Task SendSelectProduct(string skuCode)
     {
         if (connection.State == HubConnectionState.Connected)
         {
-            await connection.InvokeAsync("SelectProduct", productId);
-            Debug.Log("Máy A đã gửi lệnh: " + productId);
+            await connection.InvokeAsync("SelectProduct", skuCode);
+            Debug.Log("Máy A đã gửi lệnh: " + skuCode);
         }
     }
 

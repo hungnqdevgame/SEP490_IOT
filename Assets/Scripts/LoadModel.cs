@@ -19,12 +19,9 @@ public class LoadModel : MonoBehaviour
 
     void Start()
     {
-        // Fix cứng URL ở đây: Dùng http, IP cục bộ 127.0.0.1, và cổng 5035
-        // Thêm tham số tick để chống cache
-        //bundleURL = "http://10.87.21.29:5035/robot?t=" + System.DateTime.Now.Ticks;
-
+    
         Debug.Log("Đang kết nối tới: " + bundleURL);
-        StartCoroutine(DownloadAndPlace());
+     
     }
 
     public void DownloadAndShow(string bundleUrl, string assetName = "KyleRobot")
