@@ -12,27 +12,20 @@ public class ProductDisplay : MonoBehaviour
     public LoadModel modelLoader;
 
     [Header("API Config")]
-    // Đã đổi link API sang chuẩn của bạn
     public string apiUrlGetBySku = "http://localhost:5035/api/ProductColor/variant/by-sku/";
 
-    // Thêm biến này để tự động cộng vào trước chữ "robot"
     public string bundleServerUrl = "http://localhost:5035/";
 
     void Start()
     {
         if (SignalRManager.Instance != null)
         {
-            Debug.Log("✅ Đã tìm thấy SignalRManager! Đang đăng ký sự kiện...");
-       //     SignalRManager.Instance.OnProductReceived += ShowProduct;
             SignalRManager.Instance.OnProductReceived += HandleProductReceived;
             SignalRManager.Instance.OnProductRotatedEvent += RotateMyModel;
         }
         else
         {
-            SignalRManager.Instance.OnProductRotatedEvent -= RotateMyModel;
-            // NẾU BẠN THẤY DÒNG NÀY TRONG CONSOLE -> ĐÂY LÀ LỖI
-            Debug.LogError("❌ LỖI TO: Không tìm thấy SignalRManager.Instance! Script này chạy sớm hơn Manager hoặc Manager chưa được tạo.");
-        }
+            SignalRManager.Instance.OnProductRotatedEvent -= RotateMyModel;        }
     }
 
     void OnDestroy()
@@ -82,7 +75,7 @@ public class ProductDisplay : MonoBehaviour
         Debug.Log($"[XOAY] Đã xoay model đến góc Y = {angle}");
     }
 
-    public void LoadScene1()
+    public void LoadProductScene()
     {
        SceneManager.LoadScene("Product Scene");
         Debug.Log("Đã chuyển về Scene 1 (Product Scene)");

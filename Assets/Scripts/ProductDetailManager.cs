@@ -98,19 +98,29 @@ public class ProductDetailManager : MonoBehaviour
 
     private void OnColorSelected(string modelUrl)
     {
-        // Chống lỗi rỗng
-        if (string.IsNullOrEmpty(modelUrl) || modelUrl == "string") modelUrl = "KyleRobot";
+        // Chống lỗi rỗng: Nếu API không có tên model, mặc định gọi file "robot"
+        if (string.IsNullOrEmpty(modelUrl) || modelUrl == "string") modelUrl = "robot";
 
         Debug.Log($"[MÀN 2] Đã chọn màu! Đang gọi tải Model 3D: {modelUrl}");
 
-        // ==========================================
-        // GỌI SCRIPT LOAD MODEL 3D CỦA BẠN TẠI ĐÂY
-        // Trong ảnh tôi thấy bạn có script LoadModel (LoadAssetBundle)
-        // Ví dụ: FindObjectOfType<LoadModel>().HamLoadModelCuaBan(modelUrl);
-        // ==========================================
-    }
+        // 1. Tìm thợ tải Model (LoadModel) đang có mặt trong Màn 2
+        LoadModel modelLoader = FindFirstObjectByType<LoadModel>();
 
-    // Gắn hàm này vào Nút "Trở Lại" ở góc trái màn hình
+        if (modelLoader != null)
+        {
+            // 2. Ghép link server với tên model (API đang trả về chữ "robot")
+            // Kết quả sẽ thành: http://localhost:5035/robot
+            string bundleServerUrl = "http://localhost:5035/";
+            string fullBundleUrl = bundleServerUrl + modelUrl;
+
+            // 3. Ra lệnh tải file AssetBundle từ mạng về!
+            modelLoader.DownloadAndShow(fullBundleUrl, modelUrl);
+        }
+        else
+        {
+            Debug.LogError("❌ LỖI: Không tìm thấy script LoadModel ở Màn 2! Đảm bảo GameManager có gắn LoadModel.");
+        }
+    }
     public void BackToScene1()
     {
         SceneManager.LoadScene("Product Scene");

@@ -12,60 +12,59 @@ public class BypassCertificate : CertificateHandler
 
 public class LoadModel : MonoBehaviour
 {
-    // Đã chuyển thành private để Inspector không ghi đè được nữa
-    public string bundleURL = "http://localhost:5035/robot";
+   
     public string assetName = "robot";
     private GameObject currentModel;
 
     void Start()
     {
     
-        Debug.Log("Đang kết nối tới: " + bundleURL);
+     
      
     }
 
     public void DownloadAndShow(string bundleUrl, string assetName = "KyleRobot")
     {
         Debug.Log("Bắt đầu tải AssetBundle từ: " + bundleUrl);
-        StartCoroutine(DownloadAndPlace1(bundleUrl, assetName));
+        StartCoroutine(DownloadAndPlace(bundleUrl, assetName));
     }
 
-    IEnumerator DownloadAndPlace()
-    {
-        using (UnityWebRequest uwr = UnityWebRequestAssetBundle.GetAssetBundle(bundleURL))
-        {
-            uwr.certificateHandler = new BypassCertificate();
+    //IEnumerator DownloadAndPlace()
+    //{
+    //    using (UnityWebRequest uwr = UnityWebRequestAssetBundle.GetAssetBundle(bundleURL))
+    //    {
+    //        uwr.certificateHandler = new BypassCertificate();
 
-            yield return uwr.SendWebRequest();
+    //        yield return uwr.SendWebRequest();
 
-            if (uwr.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("LỖI MẠNG THỰC SỰ: " + uwr.responseCode + " - " + uwr.error);
-            }
-            else
-            {
-                Debug.Log("Tải thành công! Đang giải nén model...");
-                AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(uwr);
+    //        if (uwr.result != UnityWebRequest.Result.Success)
+    //        {
+    //            Debug.LogError("LỖI MẠNG THỰC SỰ: " + uwr.responseCode + " - " + uwr.error);
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("Tải thành công! Đang giải nén model...");
+    //            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(uwr);
 
-                if (bundle != null)
-                {
-                    GameObject prefab = bundle.LoadAsset<GameObject>(assetName);
-                    if (prefab != null)
-                    {
-                        Instantiate(prefab);
-                        Debug.Log("Đã hiển thị Robot lên màn hình!");
-                    }
-                    else
-                    {
-                        Debug.LogError("Không tìm thấy Asset nào tên là: " + assetName + " trong bundle này.");
-                    }
-                    bundle.Unload(false);
-                }
-            }
-        }
-    }
+    //            if (bundle != null)
+    //            {
+    //                GameObject prefab = bundle.LoadAsset<GameObject>(assetName);
+    //                if (prefab != null)
+    //                {
+    //                    Instantiate(prefab);
+    //                    Debug.Log("Đã hiển thị Robot lên màn hình!");
+    //                }
+    //                else
+    //                {
+    //                    Debug.LogError("Không tìm thấy Asset nào tên là: " + assetName + " trong bundle này.");
+    //                }
+    //                bundle.Unload(false);
+    //            }
+    //        }
+    //    }
+    //}
 
-    IEnumerator DownloadAndPlace1(string bundleURL, string assetName)
+    IEnumerator DownloadAndPlace(string bundleURL, string assetName)
     {
         // 1. Xóa model cũ đi trước khi tải
         if (currentModel != null) Destroy(currentModel);
