@@ -31,7 +31,7 @@ public class ProductItem
     public string imageUrl;
     public string model3DUrl;
     public List<ColorItem> colors;
-
+  
     public string productCategoryId;
     public string brand;
     public string material;
@@ -46,6 +46,7 @@ public class ColorItem
     public string model3DUrl;
     public string imageUrl;
     public double price;
+    public string colorId;
 }
 
 [Serializable]

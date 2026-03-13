@@ -39,7 +39,6 @@ public class ProductDetailManager : MonoBehaviour
         if (priceText != null) priceText.text = product.price.ToString("N0") + " ĐỒNG";
 
         // Fix: Lấy chữ từ Data đắp lên giao diện
-        if (typeText != null) typeText.text = product.productCategoryId;
         if (brandText != null) brandText.text = product.brand;
         if (materialText != null) materialText.text = product.material;
         if (ageText != null) ageText.text = product.ageRange;
@@ -58,7 +57,8 @@ public class ProductDetailManager : MonoBehaviour
                 typeText.text = "Chưa phân loại";
             }
         }
-        // 2. Xử lý các nút màu (Giữ nguyên code của bạn)
+
+        // 2. XỬ LÝ DROPDOWN CHỌN MÀU BẰNG API
         if (colorDropdown != null)
         {
             colorDropdown.ClearOptions();
@@ -66,23 +66,11 @@ public class ProductDetailManager : MonoBehaviour
             if (product.colors != null && product.colors.Count > 0)
             {
                 colorDropdown.gameObject.SetActive(true);
-                List<string> options = new List<string>();
+                // Đặt chữ tạm trong lúc gọi mạng
+                colorDropdown.AddOptions(new List<string> { "Đang tải màu..." });
 
-                foreach (var colorData in product.colors)
-                {
-                    string[] skuParts = colorData.sku.Split('-');
-                    string colorName = skuParts.Length > 0 ? skuParts[skuParts.Length - 1] : colorData.sku;
-                    options.Add("Màu: " + colorName);
-                }
-
-                colorDropdown.AddOptions(options);
-                colorDropdown.onValueChanged.RemoveAllListeners();
-                colorDropdown.onValueChanged.AddListener((index) =>
-                {
-                    OnColorSelected(product.colors[index].model3DUrl);
-                });
-
-                OnColorSelected(product.colors[0].model3DUrl);
+                // Bắt đầu gọi API lấy tên màu
+                StartCoroutine(FetchColorNamesAndSetupDropdown(product));
             }
             else
             {
@@ -94,6 +82,63 @@ public class ProductDetailManager : MonoBehaviour
         {
             OnColorSelected(product.colors[0].model3DUrl);
         }
+    }
+
+    // ==========================================
+    // HÀM MỚI: TẢI TÊN MÀU TỪ API
+    // ==========================================
+    private IEnumerator FetchColorNamesAndSetupDropdown(ProductItem product)
+    {
+        List<string> options = new List<string>();
+
+        foreach (var colorData in product.colors)
+        {
+            // Nếu có colorId thì gọi API
+            if (!string.IsNullOrEmpty(colorData.colorId))
+            {
+                string url = "http://localhost:5035/api/Color/" + colorData.colorId;
+                using (UnityWebRequest request = UnityWebRequest.Get(url))
+                {
+                    yield return request.SendWebRequest();
+
+                    if (request.result == UnityWebRequest.Result.Success)
+                    {
+                        var response = JsonUtility.FromJson<SingleColorResponse>(request.downloadHandler.text);
+                        if (response != null && response.data != null)
+                        {
+                            // Lấy được tên màu thành công (VD: White, Red)
+                            options.Add("Màu: " + response.data.name);
+                        }
+                        else
+                        {
+                            options.Add("Màu: " + colorData.sku); // Lỗi JSON thì dùng tạm SKU
+                        }
+                    }
+                    else
+                    {
+                        options.Add("Màu: " + colorData.sku); // Lỗi mạng dùng tạm SKU
+                    }
+                }
+            }
+            else
+            {
+                options.Add("Màu: " + colorData.sku); // Không có ID màu dùng tạm SKU
+            }
+        }
+
+        // Sau khi gom đủ tên, cập nhật Dropdown
+        colorDropdown.ClearOptions();
+        colorDropdown.AddOptions(options);
+
+        // Đăng ký sự kiện chọn
+        colorDropdown.onValueChanged.RemoveAllListeners();
+        colorDropdown.onValueChanged.AddListener((index) =>
+        {
+            OnColorSelected(product.colors[index].model3DUrl);
+        });
+
+        // Bắt đầu tải Model 3D của màu ĐẦU TIÊN
+        OnColorSelected(product.colors[0].model3DUrl);
     }
 
     private void OnColorSelected(string modelUrl)
@@ -108,8 +153,7 @@ public class ProductDetailManager : MonoBehaviour
 
         if (modelLoader != null)
         {
-            // 2. Ghép link server với tên model (API đang trả về chữ "robot")
-            // Kết quả sẽ thành: http://localhost:5035/robot
+            // 2. Ghép link server với tên model
             string bundleServerUrl = "http://localhost:5035/";
             string fullBundleUrl = bundleServerUrl + modelUrl;
 
@@ -121,11 +165,11 @@ public class ProductDetailManager : MonoBehaviour
             Debug.LogError("❌ LỖI: Không tìm thấy script LoadModel ở Màn 2! Đảm bảo GameManager có gắn LoadModel.");
         }
     }
+
     public void BackToScene1()
     {
         SceneManager.LoadScene("Product Scene");
     }
-
 
     private IEnumerator FetchCategoryName(string categoryId)
     {
@@ -137,12 +181,10 @@ public class ProductDetailManager : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                // Đọc dữ liệu JSON
                 var response = JsonUtility.FromJson<SingleCategoryResponse>(request.downloadHandler.text);
 
                 if (response != null && response.data != null)
                 {
-                    // Lấy thành công, đổi chữ trên màn hình thành tên Category
                     typeText.text = response.data.name;
                     Debug.Log($"[API] Đã dịch Category ID thành tên: {response.data.name}");
                 }
@@ -154,4 +196,24 @@ public class ProductDetailManager : MonoBehaviour
             }
         }
     }
+}
+
+// ==========================================
+// CÁC CLASS HỖ TRỢ ĐỌC JSON TỪ API MÀU
+// ==========================================
+[System.Serializable]
+public class SingleColorResponse
+{
+    public bool success;
+    public string message;
+    public ColorDetail data;
+}
+
+[System.Serializable]
+public class ColorDetail
+{
+    public string id;
+    public string name;
+    public string hexCode;
+    public string skuCode;
 }

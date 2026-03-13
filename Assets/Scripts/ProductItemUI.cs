@@ -1,5 +1,4 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -15,25 +14,24 @@ public class ProductItemUI : MonoBehaviour
     [Header("Multi-Select Components")]
     public GameObject checkboxObject;   // Cái khung của ô tích (ví dụ: hình tròn)
     public Toggle selectionToggle;      // Thành phần Toggle để bắt sự kiện Click
-    public Button showButton; 
+    public Button showButton;
     // Nút "Show" hiện tại của bạn
 
     private ProductItem currentItem;    // Lưu trữ data của sản phẩm hiện tại
     private SelectionManager manager; // Quản lý tổng việc chọn nhiều
-    public Button btnRemove; 
+    public Button btnRemove;
 
     private void Start()
     {
         // Tìm manager trong Scene để báo cáo mỗi khi được tích chọn
         manager = FindFirstObjectByType<SelectionManager>();
         selectionToggle.gameObject.SetActive(false); // Ẩn Toggle ban đầu
+
         // Lắng nghe sự kiện khi người dùng tích vào ô
         if (selectionToggle != null)
         {
             selectionToggle.onValueChanged.AddListener(OnToggleChanged);
         }
-        
-
     }
 
     public void DisplayProduct(ProductItem item)
@@ -64,12 +62,10 @@ public class ProductItemUI : MonoBehaviour
             });
         }
 
-        // Mặc định khi mới hiện ra thì không ở chế độ chọn nhiều
-        SetMultiSelectMode(false);
+        // ĐÃ XÓA: SetMultiSelectMode(false); <-- Để SelectionManager tự quyết định bật/tắt
     }
 
-    // --- LOGIC CHỌN NHIỀU BẠN CẦN CHÈN ---
-
+    // --- LOGIC CHỌN NHIỀU ---
     public void SetMultiSelectMode(bool isActive)
     {
         // Ẩn/Hiện ô Checkbox/Toggle dựa trên biến isActive
@@ -83,14 +79,14 @@ public class ProductItemUI : MonoBehaviour
         // Reset lại trạng thái tích về false khi tắt chế độ chọn nhiều
         if (!isActive && selectionToggle != null)
         {
-            selectionToggle.isOn = false;
+            // CỨU TINH Ở ĐÂY: Phải dùng SetIsOnWithoutNotify để KHÔNG kích hoạt OnToggleChanged báo xóa nhầm!
+            selectionToggle.SetIsOnWithoutNotify(false);
             selectionToggle.gameObject.SetActive(false);
         }
-        else selectionToggle.gameObject.SetActive(true);
-
-
-
-
+        else
+        {
+            selectionToggle.gameObject.SetActive(true);
+        }
     }
 
     private void OnToggleChanged(bool isOn)

@@ -8,11 +8,10 @@ using UnityEngine.UI;
 public class SelectionManager : MonoBehaviour
 {
     [Header("Danh Sách TOÀN BỘ Dữ Liệu Sản Phẩm")]
-    // Bạn nhập TẤT CẢ các model của bạn vào đây (vd: 10 sản phẩm)
     public List<ModelPlaylistItem> totalProductData;
 
     [Header("List of Product Cards (4 Thẻ UI)")]
-    public List<ProductItemUI> productItems; // Kéo đúng 4 thẻ Panel 1,2,3,4 vào đây
+    public List<ProductItemUI> productItems;
 
     [Header("API Settings")]
     public string apiUrl = "http://localhost:5035/api/Product/paginated";
@@ -42,13 +41,8 @@ public class SelectionManager : MonoBehaviour
     void Start()
     {
         panel.SetActive(false);
-        // Khởi động thì load ngay trang 1
         LoadPage(1);
     }
-
-    // ==========================================
-    // CÁC HÀM XỬ LÝ PHÂN TRANG (PAGINATION)
-    // ==========================================
 
     public void NextPage()
     {
@@ -62,7 +56,6 @@ public class SelectionManager : MonoBehaviour
 
     private void LoadPage(int page)
     {
-        // Tạm khóa 2 nút bấm để tránh người dùng click liên tục làm nghẽn mạng
         if (nextButton != null) nextButton.interactable = false;
         if (prevButton != null) prevButton.interactable = false;
 
@@ -71,51 +64,24 @@ public class SelectionManager : MonoBehaviour
 
     private IEnumerator FetchPageCoroutine(int page)
     {
-        // Tạo link API hoàn chỉnh
         string url = $"{apiUrl}?pageNumber={page}&pageSize={itemsPerPage}";
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
-            // Đợi tải xong
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
-                Debug.Log($"[API] Trả về trang {page}: " + jsonResponse);
-
-                // Ép kiểu JSON thành class ProductRoot của bạn
                 ProductRoot response = JsonUtility.FromJson<ProductRoot>(jsonResponse);
 
-                // =========================================================
-                // HỆ THỐNG MÁY DÒ LỖI (Báo cáo chi tiết ra Console)
-                // =========================================================
-                if (response == null)
+                if (response != null && response.data != null && response.data.items != null)
                 {
-                    Debug.LogError("❌ [LỖI 1] JsonUtility không đọc được gì cả!");
-                }
-                else if (response.data == null)
-                {
-                    Debug.LogError("❌ [LỖI 2] Giải mã được JSON nhưng biến 'data' bị rỗng. (Có thể bạn quên đặt [Serializable] trước class ProductData)");
-                }
-                else if (response.data.items == null)
-                {
-                    Debug.LogError("❌ [LỖI 3] Đọc được data nhưng danh sách 'items' bị rỗng! (Có thể quên [Serializable] trước class ProductItem)");
-                }
-                else
-                {
-                    // NẾU VÀO ĐƯỢC ĐÂY NGHĨA LÀ JSON ĐÃ ĐƯỢC ĐỌC HOÀN HẢO 100%
-                    Debug.Log($"✅ [THÀNH CÔNG] Đã giải mã được {response.data.items.Count} sản phẩm từ API!");
-                    Debug.Log($"✅ [KIỂM TRA UI] Số lượng thẻ Panel UI đang có là: {productItems.Count}");
-
-                    // Cập nhật thông số trang
                     currentPage = response.data.pageNumber;
                     maxPage = response.data.totalPages;
 
-                    // Đổ dữ liệu lên UI
                     UpdateUIWithApiData(response.data.items);
                 }
-                // =========================================================
             }
             else
             {
@@ -123,11 +89,11 @@ public class SelectionManager : MonoBehaviour
             }
         }
 
-        // Cập nhật lại UI số trang và nút bấm
         if (pageText != null) pageText.text = currentPage.ToString();
         if (prevButton != null) prevButton.interactable = (currentPage > 1);
         if (nextButton != null) nextButton.interactable = (currentPage < maxPage);
     }
+
     private void UpdateUIWithApiData(List<ProductItem> apiItems)
     {
         for (int i = 0; i < productItems.Count; i++)
@@ -137,77 +103,73 @@ public class SelectionManager : MonoBehaviour
                 productItems[i].gameObject.SetActive(true);
                 ProductItem data = apiItems[i];
 
-                // 1. Đổ chữ và hình ảnh
-                productItems[i].DisplayProduct(data);
-
-                // 2. ÉP GIỮ TRẠNG THÁI "CHỌN NHIỀU" KHI QUA TRANG
-                productItems[i].SetMultiSelectMode(isMultiSelectMode);
-
-                // 3. TỰ ĐỘNG ĐÁNH DẤU TICK NẾU ĐÃ CHỌN TỪ TRƯỚC
+                // 1. TẠM THỜI GỠ SỰ KIỆN TRƯỚC KHI UI LÀM VIỆC (Quan trọng nhất)
                 if (productItems[i].selectionToggle != null)
                 {
-                    // Gỡ bỏ các sự kiện của thẻ cũ để tránh gọi nhầm
                     productItems[i].selectionToggle.onValueChanged.RemoveAllListeners();
+                }
 
-                    // Kiểm tra xem món mới này đã nằm trong giỏ hàng chưa
-                    bool isSelected = selectedList.Exists(  x => x.assetName == data.name);
+                // 2. Đổ chữ và hình ảnh an toàn
+                productItems[i].DisplayProduct(data);
 
-                    // CỨU TINH Ở ĐÂY: Dùng SetIsOnWithoutNotify thay vì .isOn
-                    // Lệnh này ép cái ô UI đổi trạng thái tick mà KHÔNG làm kích hoạt sự kiện xóa ngầm
+                // 3. ÉP GIỮ TRẠNG THÁI "CHỌN NHIỀU" KHI QUA TRANG
+                productItems[i].SetMultiSelectMode(isMultiSelectMode);
+
+                // 4. TỰ ĐỘNG ĐÁNH DẤU TICK NẾU ĐÃ CHỌN TỪ TRƯỚC
+                if (productItems[i].selectionToggle != null)
+                {
+                    bool isSelected = selectedList.Exists(x => x.assetName == data.name);
+
+                    // Dùng SetIsOnWithoutNotify để Checkbox đánh tick mà không gửi tín hiệu
                     productItems[i].selectionToggle.SetIsOnWithoutNotify(isSelected);
 
-                    // Gắn lại sự kiện: Từ bây giờ, nếu người dùng thực sự lấy tay bấm tick, thì mới thêm/xóa
+                    // 5. GẮN LẠI SỰ KIỆN GHI NHẬN CHO NGƯỜI DÙNG BẤM
                     productItems[i].selectionToggle.onValueChanged.AddListener((isOn) =>
                     {
-                        ModelPlaylistItem newItem = new ModelPlaylistItem { assetName = data.name };
+                        // Lấy thêm ModelUrl để trình diễn Slideshow 3D sau này
+                        ModelPlaylistItem newItem = new ModelPlaylistItem
+                        {
+                            assetName = data.name,
+                            modelUrl = data.model3DUrl
+                        };
                         UpdateSelection(newItem, isOn);
                     });
                 }
             }
             else
             {
-                // Ẩn các thẻ dư thừa ở trang cuối
                 productItems[i].gameObject.SetActive(false);
             }
         }
     }
 
-    // ==========================================
-    // CÁC HÀM CŨ GIỮ NGUYÊN
-    // ==========================================
-
     public void ToggleMultiSelectMode()
     {
         isMultiSelectMode = !isMultiSelectMode;
 
-        // Xử lý giỏ hàng khi thoát chế độ
         if (!isMultiSelectMode)
         {
-            selectedList.Clear(); // Xóa bộ nhớ
+            selectedList.Clear();
             UpdateCounterUI();
         }
 
-        // Ép toàn bộ thẻ UI đổi giao diện theo đúng chế độ
         foreach (var item in productItems)
         {
             if (item != null && item.gameObject.activeSelf)
             {
                 item.SetMultiSelectMode(isMultiSelectMode);
 
-                // NẾU HỦY CHỌN: Phải tắt luôn dấu tick trên màn hình đi
                 if (!isMultiSelectMode && item.selectionToggle != null)
                 {
-                    item.selectionToggle.isOn = false;
+                    // Fix lỗi hủy ngầm khi tắt chế độ MultiSelect
+                    item.selectionToggle.SetIsOnWithoutNotify(false);
                 }
             }
         }
 
-        // Bật/tắt các khung viền và nút bấm chung
-      //  playButton.SetActive(isMultiSelectMode);
         if (counterText != null) counterText.gameObject.SetActive(isMultiSelectMode);
         if (panel != null) panel.SetActive(isMultiSelectMode);
 
-        // Đổi chữ nút điều khiển
         if (btnSelectText != null)
         {
             btnSelectText.text = isMultiSelectMode ? "Hủy chọn" : "Chọn nhiều";
@@ -284,5 +246,5 @@ public class SelectionManager : MonoBehaviour
         }
     }
 
-    public void ShowSelectedReview() { OnNextButtonClick(); } // Gộp chung cho gọn
+    public void ShowSelectedReview() { OnNextButtonClick(); }
 }
