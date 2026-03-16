@@ -71,6 +71,7 @@ public class ModelPlaylistItem
     public string modelUrl;       // Đường dẫn đến file robot hoặc .glb trên Render
     public string assetName;      // Tên Prefab (ví dụ: KyleRobot)
     public float displayDuration; // Thời gian hiển thị (giây)
+    public string sku;             // SKU để gọi API (ví dụ: S-000005-W)    
 }
 
 // THÊM 2 CLASS NÀY ĐỂ ĐỌC API CATEGORY ĐƠN LẺ

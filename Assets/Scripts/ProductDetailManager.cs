@@ -21,10 +21,21 @@ public class ProductDetailManager : MonoBehaviour
 
     void Start()
     {
-        if (DataBridge.selectedProduct != null)
+        if (DataBridge.isSlideshowMode && DataBridge.playlist != null && DataBridge.playlist.Count > 0)
+        {
+            Debug.Log("[MÀN 2] Khởi động chế độ Trình Chiếu (Slideshow)!");
+
+            // Ẩn Dropdown chọn màu đi vì máy sẽ tự động chiếu
+            if (colorDropdown != null) colorDropdown.gameObject.SetActive(false);
+
+            // Bắt đầu luồng chiếu tự động
+            StartCoroutine(PlaySlideshowRoutine());
+        }
+        // 2. NẾU KHÔNG PHẢI SLIDESHOW, THÌ CHIẾU 1 SẢN PHẨM BÌNH THƯỜNG
+        else if (DataBridge.selectedProduct != null)
         {
             Debug.Log($"[MÀN 2] Đã mở balo và thấy: {DataBridge.selectedProduct.name}");
-            SetupUI(DataBridge.selectedProduct); // Gọi hàm SetupUI ở ngay bên dưới nó
+            SetupUI(DataBridge.selectedProduct);
         }
         else
         {
@@ -134,17 +145,17 @@ public class ProductDetailManager : MonoBehaviour
         colorDropdown.onValueChanged.RemoveAllListeners();
         colorDropdown.onValueChanged.AddListener((index) =>
         {
-            OnColorSelected(product.colors[index].model3DUrl);
+            OnColorSelected(product.colors[index].sku);
         });
 
         // Bắt đầu tải Model 3D của màu ĐẦU TIÊN
-        OnColorSelected(product.colors[0].model3DUrl);
+        OnColorSelected(product.colors[0].sku);
     }
 
     private void OnColorSelected(string modelUrl)
     {
-        // Chống lỗi rỗng: Nếu API không có tên model, mặc định gọi file "robot"
-        if (string.IsNullOrEmpty(modelUrl) || modelUrl == "string") modelUrl = "robot";
+        //// Chống lỗi rỗng: Nếu API không có tên model, mặc định gọi file "robot"
+        //if (string.IsNullOrEmpty(modelUrl) || modelUrl == "string") modelUrl = "robot";
 
         Debug.Log($"[MÀN 2] Đã chọn màu! Đang gọi tải Model 3D: {modelUrl}");
 
@@ -166,10 +177,7 @@ public class ProductDetailManager : MonoBehaviour
         }
     }
 
-    public void BackToScene1()
-    {
-        SceneManager.LoadScene("Product Scene");
-    }
+    
 
     private IEnumerator FetchCategoryName(string categoryId)
     {
@@ -195,6 +203,65 @@ public class ProductDetailManager : MonoBehaviour
                 typeText.text = "Lỗi kết nối";
             }
         }
+    }
+
+    private IEnumerator PlaySlideshowRoutine()
+    {
+        LoadModel modelLoader = FindFirstObjectByType<LoadModel>();
+        if (modelLoader == null) yield break;
+
+        string bundleServerUrl = "http://localhost:5035/";
+        int currentIndex = 0;
+
+        // Vòng lặp vô hạn: Chiếu hết danh sách tự động quay lại đầu
+        while (true)
+        {
+            var currentItem = DataBridge.playlist[currentIndex];
+
+            // Cập nhật tên sản phẩm trên màn hình
+            if (nameText != null) nameText.text = currentItem.assetName;
+
+            // Xử lý link tải 
+            string skuUrl = currentItem.modelUrl;
+
+            // ==========================================
+            // LẮP LẠI BỘ BẢO HIỂM CHỐNG LỖI 404 (QUAN TRỌNG)
+            // ==========================================
+            if (string.IsNullOrEmpty(skuUrl) || skuUrl.Trim() == "")
+            {
+                skuUrl = "robot"; // Tự động vá lỗi bằng tên file mặc định
+                Debug.LogWarning($"[CẢNH BÁO] Link tải bị rỗng! Đã tự động vá lỗi thành: {skuUrl}");
+            }
+
+            string fullBundleUrl = bundleServerUrl + skuUrl;
+
+            Debug.Log($"[SLIDESHOW] Đang tải {currentItem.assetName}. Thời gian chiếu: {currentItem.displayDuration} giây.");
+
+            // Tải mô hình
+            modelLoader.DownloadAndShow(fullBundleUrl, skuUrl);
+
+            // Bắt Unity đợi đúng số giây bạn đã nhập
+            yield return new WaitForSeconds(currentItem.displayDuration);
+
+            // Chuyển sang món đồ chơi tiếp theo
+            currentIndex++;
+            if (currentIndex >= DataBridge.playlist.Count)
+            {
+                currentIndex = 0; // Quay về đầu danh sách
+            }
+        }
+    }
+
+    public void BackToScene1()
+    {
+        // ==========================================
+        // DỌN SẠCH BALO TRƯỚC KHI VỀ MÀN 1
+        // (Để hệ thống không bị kẹt data rỗng của lần chạy cũ)
+        // ==========================================
+        DataBridge.isSlideshowMode = false;
+        if (DataBridge.playlist != null) DataBridge.playlist.Clear();
+
+        SceneManager.LoadScene("Product Scene");
     }
 }
 

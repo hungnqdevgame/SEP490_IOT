@@ -109,11 +109,11 @@ public class ProductDisplay : MonoBehaviour
                 // Giải mã JSON
                 var response = JsonUtility.FromJson<ProductColorApiResponse>(request.downloadHandler.text);
 
-                if (response != null && response.data != null && !string.IsNullOrEmpty(response.data.model3DUrl))
+                if (response != null && response.data != null && !string.IsNullOrEmpty(response.data.productSku))
                 {
                     // 2. Xử lý đường link AssetBundle
-                    string modelFileName = response.data.model3DUrl; // Ví dụ: "robot"
-
+                    string modelFileName = response.data.productSku; // Ví dụ: "robot"
+                    Debug.Log(modelFileName);
                     // Ghép link tải Bundle hoàn chỉnh: http://localhost:5035/robot
                     string fullBundleUrl = bundleServerUrl + modelFileName;
 

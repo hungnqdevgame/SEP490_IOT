@@ -23,7 +23,7 @@ public class LoadModel : MonoBehaviour
      
     }
 
-    public void DownloadAndShow(string bundleUrl, string assetName = "KyleRobot")
+    public void DownloadAndShow(string bundleUrl, string assetName )
     {
         Debug.Log("Bắt đầu tải AssetBundle từ: " + bundleUrl);
         StartCoroutine(DownloadAndPlace(bundleUrl, assetName));

@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class SelectionManager : MonoBehaviour
 {
+    [Header("Slideshow Settings")]
+    public TMP_InputField timeInput;
+
     [Header("Danh Sách TOÀN BỘ Dữ Liệu Sản Phẩm")]
     public List<ModelPlaylistItem> totalProductData;
 
@@ -44,51 +48,35 @@ public class SelectionManager : MonoBehaviour
         LoadPage(1);
     }
 
-    public void NextPage()
-    {
-        if (currentPage < maxPage) LoadPage(currentPage + 1);
-    }
-
-    public void PreviousPage()
-    {
-        if (currentPage > 1) LoadPage(currentPage - 1);
-    }
+    public void NextPage() { if (currentPage < maxPage) LoadPage(currentPage + 1); }
+    public void PreviousPage() { if (currentPage > 1) LoadPage(currentPage - 1); }
 
     private void LoadPage(int page)
     {
         if (nextButton != null) nextButton.interactable = false;
         if (prevButton != null) prevButton.interactable = false;
-
         StartCoroutine(FetchPageCoroutine(page));
     }
 
     private IEnumerator FetchPageCoroutine(int page)
     {
         string url = $"{apiUrl}?pageNumber={page}&pageSize={itemsPerPage}";
-
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
-
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string jsonResponse = request.downloadHandler.text;
                 ProductRoot response = JsonUtility.FromJson<ProductRoot>(jsonResponse);
-
                 if (response != null && response.data != null && response.data.items != null)
                 {
                     currentPage = response.data.pageNumber;
                     maxPage = response.data.totalPages;
-
                     UpdateUIWithApiData(response.data.items);
                 }
             }
-            else
-            {
-                Debug.LogError($"[API LỖI] {request.error}");
-            }
+            else Debug.LogError($"[API LỖI] {request.error}");
         }
-
         if (pageText != null) pageText.text = currentPage.ToString();
         if (prevButton != null) prevButton.interactable = (currentPage > 1);
         if (nextButton != null) nextButton.interactable = (currentPage < maxPage);
@@ -103,50 +91,49 @@ public class SelectionManager : MonoBehaviour
                 productItems[i].gameObject.SetActive(true);
                 ProductItem data = apiItems[i];
 
-                // 1. TẠM THỜI GỠ SỰ KIỆN TRƯỚC KHI UI LÀM VIỆC (Quan trọng nhất)
                 if (productItems[i].selectionToggle != null)
                 {
                     productItems[i].selectionToggle.onValueChanged.RemoveAllListeners();
                 }
 
-                // 2. Đổ chữ và hình ảnh an toàn
                 productItems[i].DisplayProduct(data);
-
-                // 3. ÉP GIỮ TRẠNG THÁI "CHỌN NHIỀU" KHI QUA TRANG
                 productItems[i].SetMultiSelectMode(isMultiSelectMode);
 
-                // 4. TỰ ĐỘNG ĐÁNH DẤU TICK NẾU ĐÃ CHỌN TỪ TRƯỚC
                 if (productItems[i].selectionToggle != null)
                 {
                     bool isSelected = selectedList.Exists(x => x.assetName == data.name);
-
-                    // Dùng SetIsOnWithoutNotify để Checkbox đánh tick mà không gửi tín hiệu
                     productItems[i].selectionToggle.SetIsOnWithoutNotify(isSelected);
 
-                    // 5. GẮN LẠI SỰ KIỆN GHI NHẬN CHO NGƯỜI DÙNG BẤM
                     productItems[i].selectionToggle.onValueChanged.AddListener((isOn) =>
                     {
-                        // Lấy thêm ModelUrl để trình diễn Slideshow 3D sau này
+                        // 1. LẤY MÃ SKU CHUẨN XÁC NHẤT
+                        string correctSku = data.sku;
+                        if (data.colors != null && data.colors.Count > 0 && !string.IsNullOrEmpty(data.colors[0].sku))
+                        {
+                            correctSku = data.colors[0].sku;
+                        }
+
+                        // 2. GÁN DỮ LIỆU VÀO CẢ 2 BIẾN ĐỂ TRÁNH LỖI RỖNG
                         ModelPlaylistItem newItem = new ModelPlaylistItem
                         {
                             assetName = data.name,
-                            modelUrl = data.model3DUrl
+                            modelUrl = correctSku, // BẮT BUỘC PHẢI CÓ DÒNG NÀY (Để Màn 2 biết đường link tải)
+                            sku = correctSku       // Gán luôn cho biến sku mà bạn mới tạo
                         };
+
+                        Debug.Log($"[GIỎ HÀNG] Đang nhặt {newItem.assetName} - Link tải: {newItem.modelUrl}");
+
                         UpdateSelection(newItem, isOn);
                     });
                 }
             }
-            else
-            {
-                productItems[i].gameObject.SetActive(false);
-            }
+            else productItems[i].gameObject.SetActive(false);
         }
     }
 
     public void ToggleMultiSelectMode()
     {
         isMultiSelectMode = !isMultiSelectMode;
-
         if (!isMultiSelectMode)
         {
             selectedList.Clear();
@@ -158,10 +145,8 @@ public class SelectionManager : MonoBehaviour
             if (item != null && item.gameObject.activeSelf)
             {
                 item.SetMultiSelectMode(isMultiSelectMode);
-
                 if (!isMultiSelectMode && item.selectionToggle != null)
                 {
-                    // Fix lỗi hủy ngầm khi tắt chế độ MultiSelect
                     item.selectionToggle.SetIsOnWithoutNotify(false);
                 }
             }
@@ -169,7 +154,6 @@ public class SelectionManager : MonoBehaviour
 
         if (counterText != null) counterText.gameObject.SetActive(isMultiSelectMode);
         if (panel != null) panel.SetActive(isMultiSelectMode);
-
         if (btnSelectText != null)
         {
             btnSelectText.text = isMultiSelectMode ? "Hủy chọn" : "Chọn nhiều";
@@ -181,8 +165,7 @@ public class SelectionManager : MonoBehaviour
     {
         if (add)
         {
-            bool exists = selectedList.Exists(x => x.assetName == item.assetName);
-            if (!exists)
+            if (!selectedList.Exists(x => x.assetName == item.assetName))
             {
                 selectedList.Add(item);
                 Debug.Log("Đã THÊM: " + item.assetName + " | Tổng: " + selectedList.Count);
@@ -196,21 +179,13 @@ public class SelectionManager : MonoBehaviour
         UpdateCounterUI();
     }
 
-    void UpdateCounterUI()
-    {
-        if (counterText != null) counterText.text = $"Đã chọn: {selectedList.Count}";
-    }
+    void UpdateCounterUI() { if (counterText != null) counterText.text = $"Đã chọn: {selectedList.Count}"; }
 
-    public void OnPlayClick()
-    {
-        if (selectedList.Count > 0)
-            FindObjectOfType<ModelSlideshow>().StartNewPlaylist(selectedList);
-    }
+    public void OnPlayClick() { if (selectedList.Count > 0) FindObjectOfType<ModelSlideshow>().StartNewPlaylist(selectedList); }
 
     public void OnNextButtonClick()
     {
         if (selectedList.Count == 0) return;
-
         mainListPanel.SetActive(false);
         reviewPanel.SetActive(true);
 
@@ -244,6 +219,20 @@ public class SelectionManager : MonoBehaviour
             }
             catch (System.Exception e) { Debug.LogError($"LỖI: {e.Message}"); }
         }
+    }
+
+    public void OnConfirmSlideshowClick()
+    {
+        if (selectedList.Count == 0) return;
+        float minutes = 1f;
+        if (timeInput != null && !string.IsNullOrEmpty(timeInput.text)) float.TryParse(timeInput.text, out minutes);
+        if (minutes <= 0) minutes = 1f;
+        float seconds = minutes * 60f;
+
+        DataBridge.playlist = new List<ModelPlaylistItem>(selectedList);
+        foreach (var item in DataBridge.playlist) item.displayDuration = seconds;
+        DataBridge.isSlideshowMode = true;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Display Product");
     }
 
     public void ShowSelectedReview() { OnNextButtonClick(); }
