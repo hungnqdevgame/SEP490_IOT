@@ -1,9 +1,12 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.59f2
-CRC: 2529437109
+CRC: 110542693
 HashAppended: 0
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
       Name: s-000006-w
+      Dependencies: {}
+    Info_1:
+      Name: s-000008-rd
       Dependencies: {}
