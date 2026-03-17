@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class CategoryDropdownManager : MonoBehaviour
 {
@@ -81,4 +82,10 @@ public class CategoryDropdownManager : MonoBehaviour
             productListManager.FilterByCategory(selectedId);
         }
     }
+
+    public void LoadSceneGame()
+    {
+        SceneManager.LoadScene("Display Product");
+    }
+
 }

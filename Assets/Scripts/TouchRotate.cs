@@ -2,23 +2,32 @@
 
 public class TouchRotate : MonoBehaviour
 {
-    [Header("Cấu hình")]
+    [Header("Cấu hình Vuốt/Chuột")]
     public float rotationSpeed = 0.2f;
     public bool invertDirection = true;
 
-    [Header("Trạng thái")]
-    public bool isLeft = false;
-    private bool _lastIsLeft; // Biến dùng để kiểm tra sự thay đổi
-
     void Start()
     {
-        // Khởi tạo trạng thái ban đầu để tránh lỗi khi vừa vào game
-        _lastIsLeft = isLeft;
+        // 1. ĐĂNG KÝ LẮNG NGHE SỰ KIỆN TỪ RASPBERRY PI (SIGNALR)
+        if (SignalRManager.Instance != null)
+        {
+            SignalRManager.Instance.OnProductRotatedEvent += OnReceiveRotationFromPi;
+            Debug.Log("✅ TouchRotate đã kết nối với SignalR để nhận góc xoay từ Pi!");
+        }
+    }
+
+    void OnDestroy()
+    {
+        // Hủy đăng ký khi object (Model) bị xóa để tránh lỗi rò rỉ bộ nhớ
+        if (SignalRManager.Instance != null)
+        {
+            SignalRManager.Instance.OnProductRotatedEvent -= OnReceiveRotationFromPi;
+        }
     }
 
     void Update()
     {
-        // --- 1. XỬ LÝ CẢM ỨNG (Giữ nguyên) ---
+  
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -30,40 +39,33 @@ public class TouchRotate : MonoBehaviour
             }
         }
 
-        // --- 2. XỬ LÝ CHUỘT (Giữ nguyên) ---
+        // --- XỬ LÝ CHUỘT (Giữ nguyên) ---
         if (Input.GetMouseButton(0))
         {
             float x = Input.GetAxis("Mouse X") * rotationSpeed * 10f;
             if (invertDirection) x = -x;
             transform.Rotate(0, x, 0);
         }
-
-        // --- 3. KIỂM TRA SỰ THAY ĐỔI CỦA BIẾN isLeft ---
-        // Nếu giá trị hiện tại (isLeft) KHÁC với giá trị cũ (_lastIsLeft)
-        if (isLeft != _lastIsLeft)
-        {
-            CheckRotate(isLeft); // Thực hiện xoay 1 lần duy nhất
-            _lastIsLeft = isLeft; // Cập nhật lại giá trị cũ để chờ lần thay đổi sau
-        }
     }
 
-    void CheckRotate(bool isLeftStatus)
+ 
+    private void OnReceiveRotationFromPi(float angle)
     {
-        // Lưu ý: rotationSpeed của bạn đang là 0.2
-        // 90 * 0.2 = 18 độ.
-        // Nếu bạn muốn xoay hẳn 90 độ thì nên bỏ nhân với rotationSpeed ở đây
+        /* * Tùy thuộc vào việc Raspberry Pi của bạn gửi dữ liệu kiểu gì, 
+         * bạn hãy BẬT một trong 2 cách dưới đây và XÓA cách còn lại nhé:
+         */
+        float finalAngle = (transform.rotation.y + angle) * rotationSpeed;
+   
+ 
+        transform.Rotate(0, finalAngle, 0);
 
-        float rotateAmount = 90f; // Xoay 90 độ
 
-        if (isLeftStatus)
-        {
-            // Xoay sang trái (hoặc hướng dương tùy trục)
-            transform.Rotate(0, rotateAmount, 0);
-        }
-        else
-        {
-            // Xoay sang phải (hoặc hướng âm)
-            transform.Rotate(0, -rotateAmount, 0);
-        }
+        Debug.Log($"[TÍN HIỆU PI] Đã nhận góc {angle} độ. Đang xoay model!");
+    }
+
+    private void OnRotationFromPi(float angle)
+    {
+
+        transform.Rotate(0, angle, 0);
     }
 }

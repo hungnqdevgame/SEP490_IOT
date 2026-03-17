@@ -1,11 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SelectionManager : MonoBehaviour
 {
-    [Header("List of Product Cards")]
+    [Header("Slideshow Settings")]
+    public TMP_InputField timeInput;
+
+    [Header("Danh Sách TOÀN BỘ Dữ Liệu Sản Phẩm")]
+    public List<ModelPlaylistItem> totalProductData;
+
+    [Header("List of Product Cards (4 Thẻ UI)")]
     public List<ProductItemUI> productItems;
+
+    [Header("API Settings")]
+    public string apiUrl = "http://localhost:5035/api/Product/paginated";
+
+    [Header("Pagination Control")]
+    public TextMeshProUGUI pageText;
+    public Button nextButton;
+    public Button prevButton;
+    private int currentPage = 1;
+    private int itemsPerPage = 4;
+    private int maxPage = 1;
 
     [Header("UI Control")]
     public TextMeshProUGUI btnSelectText;
@@ -15,37 +36,128 @@ public class SelectionManager : MonoBehaviour
     public GameObject productItemPrefab;
     public Transform selectedItemsContainer;
 
-
-    public List<ProductItemUI> allItems; // Kéo tất cả thẻ sản phẩm vào đây
-    public TextMeshProUGUI counterText; // Chỗ hiển thị "Đã chọn: X"
-    public GameObject playButton;       // Nút "Phát danh sách"
+    public TextMeshProUGUI counterText;
+    public GameObject playButton;
 
     private List<ModelPlaylistItem> selectedList = new List<ModelPlaylistItem>();
     private bool isMultiSelectMode = false;
 
     void Start()
     {
-
         panel.SetActive(false);
+        LoadPage(1);
     }
 
-    // Gọi khi nhấn nút "Chọn nhiều" trên UI
+    public void NextPage() { if (currentPage < maxPage) LoadPage(currentPage + 1); }
+    public void PreviousPage() { if (currentPage > 1) LoadPage(currentPage - 1); }
+
+    private void LoadPage(int page)
+    {
+        if (nextButton != null) nextButton.interactable = false;
+        if (prevButton != null) prevButton.interactable = false;
+        StartCoroutine(FetchPageCoroutine(page));
+    }
+
+    private IEnumerator FetchPageCoroutine(int page)
+    {
+        string url = $"{apiUrl}?pageNumber={page}&pageSize={itemsPerPage}";
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            yield return request.SendWebRequest();
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string jsonResponse = request.downloadHandler.text;
+                ProductRoot response = JsonUtility.FromJson<ProductRoot>(jsonResponse);
+                if (response != null && response.data != null && response.data.items != null)
+                {
+                    currentPage = response.data.pageNumber;
+                    maxPage = response.data.totalPages;
+                    UpdateUIWithApiData(response.data.items);
+                }
+            }
+            else Debug.LogError($"[API LỖI] {request.error}");
+        }
+        if (pageText != null) pageText.text = currentPage.ToString();
+        if (prevButton != null) prevButton.interactable = (currentPage > 1);
+        if (nextButton != null) nextButton.interactable = (currentPage < maxPage);
+    }
+
+    private void UpdateUIWithApiData(List<ProductItem> apiItems)
+    {
+        for (int i = 0; i < productItems.Count; i++)
+        {
+            if (i < apiItems.Count)
+            {
+                productItems[i].gameObject.SetActive(true);
+                ProductItem data = apiItems[i];
+
+                if (productItems[i].selectionToggle != null)
+                {
+                    productItems[i].selectionToggle.onValueChanged.RemoveAllListeners();
+                }
+
+                productItems[i].DisplayProduct(data);
+                productItems[i].SetMultiSelectMode(isMultiSelectMode);
+
+                if (productItems[i].selectionToggle != null)
+                {
+                    bool isSelected = selectedList.Exists(x => x.assetName == data.name);
+                    productItems[i].selectionToggle.SetIsOnWithoutNotify(isSelected);
+
+                    productItems[i].selectionToggle.onValueChanged.AddListener((isOn) =>
+                    {
+                        // 1. LẤY MÃ SKU CHUẨN XÁC NHẤT
+                        string correctSku = data.sku;
+                        if (data.colors != null && data.colors.Count > 0 && !string.IsNullOrEmpty(data.colors[0].sku))
+                        {
+                            correctSku = data.colors[0].sku;
+                        }
+
+                        // 2. GÁN DỮ LIỆU VÀO CẢ 2 BIẾN ĐỂ TRÁNH LỖI RỖNG
+                        ModelPlaylistItem newItem = new ModelPlaylistItem
+                        {
+                            assetName = data.name,
+                            modelUrl = correctSku, // BẮT BUỘC PHẢI CÓ DÒNG NÀY (Để Màn 2 biết đường link tải)
+                            sku = correctSku       // Gán luôn cho biến sku mà bạn mới tạo
+                        };
+
+                        Debug.Log($"[GIỎ HÀNG] Đang nhặt {newItem.assetName} - Link tải: {newItem.modelUrl}");
+
+                        UpdateSelection(newItem, isOn);
+                    });
+                }
+            }
+            else productItems[i].gameObject.SetActive(false);
+        }
+    }
+
     public void ToggleMultiSelectMode()
     {
         isMultiSelectMode = !isMultiSelectMode;
-
-        foreach (var item in allItems)
-        {
-            item.SetMultiSelectMode(isMultiSelectMode);
-        }
-
-        playButton.SetActive(isMultiSelectMode);
-        counterText.gameObject.SetActive(isMultiSelectMode);
-
         if (!isMultiSelectMode)
         {
             selectedList.Clear();
             UpdateCounterUI();
+        }
+
+        foreach (var item in productItems)
+        {
+            if (item != null && item.gameObject.activeSelf)
+            {
+                item.SetMultiSelectMode(isMultiSelectMode);
+                if (!isMultiSelectMode && item.selectionToggle != null)
+                {
+                    item.selectionToggle.SetIsOnWithoutNotify(false);
+                }
+            }
+        }
+
+        if (counterText != null) counterText.gameObject.SetActive(isMultiSelectMode);
+        if (panel != null) panel.SetActive(isMultiSelectMode);
+        if (btnSelectText != null)
+        {
+            btnSelectText.text = isMultiSelectMode ? "Hủy chọn" : "Chọn nhiều";
+            btnSelectText.gameObject.SetActive(true);
         }
     }
 
@@ -53,156 +165,75 @@ public class SelectionManager : MonoBehaviour
     {
         if (add)
         {
-            // Kiểm tra trùng lặp dựa trên tên thay vì địa chỉ bộ nhớ
-            bool exists = selectedList.Exists(x => x.assetName == item.assetName);
-
-            if (!exists)
+            if (!selectedList.Exists(x => x.assetName == item.assetName))
             {
                 selectedList.Add(item);
                 Debug.Log("Đã THÊM: " + item.assetName + " | Tổng: " + selectedList.Count);
             }
-            else
-            {
-                Debug.LogWarning("BỊ TRÙNG! Không thể thêm: " + item.assetName);
-            }
         }
         else
         {
-            // XÓA tất cả các item trong danh sách có cùng tên với item đang bị bỏ chọn
-            int removedCount = selectedList.RemoveAll(x => x.assetName == item.assetName);
-
-            if (removedCount > 0)
-            {
-                Debug.Log("Đã XÓA: " + item.assetName + " | Tổng: " + selectedList.Count);
-            }
-            else
-            {
-                Debug.LogWarning("KHÔNG TÌM THẤY ĐỂ XÓA: " + item.assetName);
-            }
+            selectedList.RemoveAll(x => x.assetName == item.assetName);
+            Debug.Log("Đã XÓA: " + item.assetName + " | Tổng: " + selectedList.Count);
         }
-
         UpdateCounterUI();
     }
 
-    void UpdateCounterUI()
-    {
-        counterText.text = $"Đã chọn: {selectedList.Count}";
-    }
+    void UpdateCounterUI() { if (counterText != null) counterText.text = $"Đã chọn: {selectedList.Count}"; }
 
-    public void OnPlayClick()
-    {
-        if (selectedList.Count > 0)
-        {
-            // Gọi sang Script ModelSlideshow đã viết trước đó
-            FindObjectOfType<ModelSlideshow>().StartNewPlaylist(selectedList);
-        }
-
-
-    }
-
-    public void ToggleSelectionMode()
-    {
-        isMultiSelectMode = !isMultiSelectMode;
-
-        // Duyệt qua toàn bộ danh sách 4 sản phẩm
-        foreach (var item in productItems)
-        {
-            if (item != null)
-            {
-                // Gọi hàm bật/tắt chế độ chọn nhiều đã viết trong ProductItemUI
-                item.SetMultiSelectMode(isMultiSelectMode);
-            }
-            panel.SetActive(isMultiSelectMode);
-        }
-
-        // Đổi tên nút để người dùng biết cách quay lại
-        if (btnSelectText != null)
-        {
-            btnSelectText.text = isMultiSelectMode ? "Hủy chọn" : "Chọn nhiều";
-        }
-    }
+    public void OnPlayClick() { if (selectedList.Count > 0) FindObjectOfType<ModelSlideshow>().StartNewPlaylist(selectedList); }
 
     public void OnNextButtonClick()
     {
-        Debug.Log("==== BẮT ĐẦU CHUYỂN MÀN HÌNH REVIEW ====");
-        Debug.Log("Số lượng sản phẩm hệ thống đang nhớ: " + selectedList.Count);
-
         if (selectedList.Count == 0) return;
-
-        // 1. Chuyển đổi UI
         mainListPanel.SetActive(false);
         reviewPanel.SetActive(true);
 
-        // 2. Dọn dẹp đồ cũ
-        foreach (Transform child in selectedItemsContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in selectedItemsContainer) Destroy(child.gameObject);
 
-        // 3. Vòng lặp chống lỗi (Try-Catch)
-        int count = 1;
         foreach (var itemData in selectedList)
         {
             try
             {
-                Debug.Log($"Đang tạo thẻ thứ {count} cho sản phẩm: {itemData.assetName}");
-
                 GameObject newItem = Instantiate(productItemPrefab, selectedItemsContainer);
-                newItem.transform.localScale = Vector3.one; // Chống lún, tàng hình
+                newItem.transform.localScale = Vector3.one;
 
                 ProductItemUI ui = newItem.GetComponent<ProductItemUI>();
-
+                if (ui.btnRemove != null)
+                {
+                    ui.btnRemove.gameObject.SetActive(true);
+                    ui.btnRemove.onClick.AddListener(() =>
+                    {
+                        selectedList.Remove(itemData);
+                        Destroy(newItem);
+                        UpdateCounterUI();
+                    });
+                }
                 if (ui != null)
                 {
                     ProductItem pItem = new ProductItem { name = itemData.assetName };
                     ui.DisplayProduct(pItem);
-
                     ui.SetMultiSelectMode(false);
                     if (ui.showButton != null) ui.showButton.gameObject.SetActive(false);
                 }
-
-                Debug.Log($"-> TẠO THÀNH CÔNG THẺ SỐ {count}!");
-                count++;
             }
-            catch (System.Exception e)
-            {
-                // Nếu có lỗi, nó sẽ in ra màu đỏ nhưng KHÔNG làm chết vòng lặp
-                Debug.LogError($"-> LỖI TẠI THẺ SỐ {count}: {e.Message}");
-                count++;
-            }
+            catch (System.Exception e) { Debug.LogError($"LỖI: {e.Message}"); }
         }
-
-        Debug.Log("==== HOÀN THÀNH QUÁ TRÌNH ====");
     }
 
-    public void ShowSelectedReview()
+    public void OnConfirmSlideshowClick()
     {
-        // 1. Chuyển đổi màn hình
-        mainListPanel.SetActive(false);
-        reviewPanel.SetActive(true);
+        if (selectedList.Count == 0) return;
+        float minutes = 1f;
+        if (timeInput != null && !string.IsNullOrEmpty(timeInput.text)) float.TryParse(timeInput.text, out minutes);
+        if (minutes <= 0) minutes = 1f;
+        float seconds = minutes * 60f;
 
-        // 2. Dọn dẹp các thẻ cũ trong màn hình Review để không bị trùng
-        foreach (Transform child in selectedItemsContainer)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // 3. Lặp qua danh sách đã chọn và tạo thẻ UI mới
-        foreach (var itemData in selectedList)
-        {
-            // Tạo thẻ sản phẩm mới bên trong vùng chứa
-            GameObject newItem = Instantiate(productItemPrefab, selectedItemsContainer);
-
-            // Lấy script UI để đổ dữ liệu vào
-            ProductItemUI ui = newItem.GetComponent<ProductItemUI>();
-
-            // Hiển thị thông tin (Tên, Ảnh từ Render)
-            ProductItem p = new ProductItem { name = itemData.assetName };
-            ui.DisplayProduct(p);
-
-            // Tắt chế độ chọn (Toggle) và nút Show ở màn hình Review này
-            ui.SetMultiSelectMode(false);
-            if (ui.showButton != null) ui.showButton.gameObject.SetActive(false);
-        }
+        DataBridge.playlist = new List<ModelPlaylistItem>(selectedList);
+        foreach (var item in DataBridge.playlist) item.displayDuration = seconds;
+        DataBridge.isSlideshowMode = true;
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Display Product");
     }
+
+    public void ShowSelectedReview() { OnNextButtonClick(); }
 }

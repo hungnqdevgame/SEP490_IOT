@@ -1,8 +1,8 @@
-﻿
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ProductItemUI : MonoBehaviour
@@ -12,30 +12,23 @@ public class ProductItemUI : MonoBehaviour
     public TextMeshProUGUI nameText;
 
     [Header("Multi-Select Components")]
-    public GameObject checkboxObject;   // Cái khung của ô tích (ví dụ: hình tròn)
-    public Toggle selectionToggle;      // Thành phần Toggle để bắt sự kiện Click
-    public Button showButton; 
-    // Nút "Show" hiện tại của bạn
-
-    private ProductItem currentItem;    // Lưu trữ data của sản phẩm hiện tại
-    private SelectionManager manager; // Quản lý tổng việc chọn nhiều
+    public GameObject checkboxObject;
+    public Toggle selectionToggle;
+    public Button showButton;
+    public Button btnRemove;
 
     private void Start()
     {
-        // Tìm manager trong Scene để báo cáo mỗi khi được tích chọn
-        manager = FindFirstObjectByType<SelectionManager>();
-        selectionToggle.gameObject.SetActive(false); // Ẩn Toggle ban đầu
-        // Lắng nghe sự kiện khi người dùng tích vào ô
+        // 1. Chỉ ẩn Toggle ban đầu. 
+        // ĐÃ XÓA SẠCH sự kiện OnToggleChanged để tránh xung đột với SelectionManager!
         if (selectionToggle != null)
         {
-            selectionToggle.onValueChanged.AddListener(OnToggleChanged);
+            selectionToggle.gameObject.SetActive(false);
         }
-
     }
 
     public void DisplayProduct(ProductItem item)
     {
-        currentItem = item; // Lưu lại data để dùng khi chọn
         gameObject.SetActive(true);
         nameText.text = item.name;
 
@@ -48,52 +41,39 @@ public class ProductItemUI : MonoBehaviour
             productImage.color = Color.gray;
         }
 
-        // Mặc định khi mới hiện ra thì không ở chế độ chọn nhiều
-        SetMultiSelectMode(false);
-    }
+        if (showButton != null)
+        {
+            showButton.onClick.RemoveAllListeners();
+            showButton.onClick.AddListener(() =>
+            {
+                // Cất dữ liệu vào Balo
+                DataBridge.selectedProduct = item;
 
-    // --- LOGIC CHỌN NHIỀU BẠN CẦN CHÈN ---
+                // Ép tắt chế độ Slideshow để Màn 2 chỉ chiếu đúng 1 đồ chơi này
+                DataBridge.isSlideshowMode = false;
+
+                // Chuyển cảnh
+                SceneManager.LoadScene("Display Product");
+            });
+        }
+    }
 
     public void SetMultiSelectMode(bool isActive)
     {
-        // Ẩn/Hiện ô Checkbox/Toggle dựa trên biến isActive
-        if (checkboxObject != null)
-            checkboxObject.SetActive(isActive);
+        if (checkboxObject != null) checkboxObject.SetActive(isActive);
+        if (showButton != null) showButton.gameObject.SetActive(!isActive);
 
-        // Ngược lại, nút Show sẽ ẩn khi Toggle hiện và ngược lại
-        if (showButton != null)
-            showButton.gameObject.SetActive(!isActive);
-
-        // Reset lại trạng thái tích về false khi tắt chế độ chọn nhiều
         if (!isActive && selectionToggle != null)
         {
-            selectionToggle.isOn = false;
+            // Dùng SetIsOnWithoutNotify cực kỳ an toàn
+            selectionToggle.SetIsOnWithoutNotify(false);
             selectionToggle.gameObject.SetActive(false);
         }
-        else selectionToggle.gameObject.SetActive(true);
-
-
-
-
-    }
-
-    private void OnToggleChanged(bool isOn)
-    {
-        if (manager != null && currentItem != null)
+        else if (selectionToggle != null)
         {
-            // Chuyển data từ ProductItem sang dạng Playlist để phát
-            ModelPlaylistItem playlistData = new ModelPlaylistItem
-            {
-                modelUrl = currentItem.model3DUrl, // Đảm bảo ProductItem có trường này từ API
-                assetName = currentItem.name,
-                displayDuration = 5.0f // Thời gian mặc định
-            };
-            Debug.Log($"Toggle changed: {isOn} for {currentItem.name}");
-            manager.UpdateSelection(playlistData, isOn);
+            selectionToggle.gameObject.SetActive(true);
         }
     }
-
-    // ------------------------------------
 
     public void Hide()
     {

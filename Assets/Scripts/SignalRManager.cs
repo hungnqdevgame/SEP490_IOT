@@ -45,20 +45,20 @@ public class SignalRManager : MonoBehaviour
              .Build();
 
         // --- PHẦN DÀNH CHO MÁY B (Màn hình) ---
-        connection.On<string>("OnProductSelected", (productId) =>
+        connection.On<string>("OnProductSelected", (skuCode) =>
         {
             // 1. DÒNG NÀY CHẠY NGAY KHI SERVER GỬI TIN (Ở luồng phụ)
-            Debug.LogError($"[BƯỚC 1] SignalR đã nhận tín hiệu từ Server! Raw ID: {productId}");
+            Debug.LogError($"[BƯỚC 1] SignalR đã nhận tín hiệu từ Server! Raw ID: {skuCode}");
 
             MainThreadDispatcher.Enqueue(() =>
             {
                 // 2. DÒNG NÀY CHẠY KHI CHUYỂN VỀ LUỒNG CHÍNH UNITY
-                Debug.LogError($"[BƯỚC 2] MainThreadDispatcher đang xử lý: {productId}");
+                Debug.LogError($"[BƯỚC 2] MainThreadDispatcher đang xử lý: {skuCode}");
 
                 if (OnProductReceived == null)
                     Debug.LogError("[LỖI] Không có ai đăng ký lắng nghe sự kiện OnProductReceived cả!");
                 else
-                    OnProductReceived.Invoke(productId);
+                    OnProductReceived.Invoke(skuCode);
             });
         });
 
@@ -88,12 +88,12 @@ public class SignalRManager : MonoBehaviour
 
     // --- PHẦN DÀNH CHO MÁY A (Điều khiển) ---
     // Hàm này được gọi khi bấm nút trên điện thoại A
-    public async Task SendSelectProduct(string productId)
+    public async Task SendSelectProduct(string skuCode)
     {
         if (connection.State == HubConnectionState.Connected)
         {
-            await connection.InvokeAsync("SelectProduct", productId);
-            Debug.Log("Máy A đã gửi lệnh: " + productId);
+            await connection.InvokeAsync("SelectProduct", skuCode);
+            Debug.Log("Máy A đã gửi lệnh: " + skuCode);
         }
     }
 

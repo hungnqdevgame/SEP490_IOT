@@ -115,8 +115,6 @@ public class ProductManager : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                // Parse JSON (Dùng class ProductResponse bạn đã tạo ở bước trước)
-                // Lưu ý: Kiểm tra lại tên class Model của bạn là ProductResponse hay ProductRoot
                 var response = JsonUtility.FromJson<ProductRoot>(request.downloadHandler.text);
 
                 if (response != null && response.data != null)
