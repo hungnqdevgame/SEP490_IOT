@@ -30,6 +30,7 @@ public class ProductItem
     public string description;
     public string imageUrl;
     public string model3DUrl;
+    public string barCode;
     public List<ColorItem> colors;
   
     public string productCategoryId;
@@ -111,4 +112,48 @@ public class ProductColorData
     public string model3DUrl; // "robot"
     public string variantSku; // "S-000005-W"
     public string colorName;
+}
+
+[System.Serializable]
+public class ProductBarcodeResponse
+{
+    public bool success;
+    public string message;
+    public ProductBarcodeData data;
+}
+
+[System.Serializable]
+public class ProductBarcodeData
+{
+    public string id;
+    public string productCategoryId;
+    public string sku;            // Lấy "R-000001"
+    public string name;           // Lấy "Robot"
+    public double basePrice;
+    public string description;
+    public string barcode;        // Lấy "1234567890"
+    public string brand;
+    public string material;
+    public string originCountry;
+    public string ageRange;
+    public bool isActive;
+    public string createdAt;
+
+    // Mảng chứa các biến thể màu sắc
+    public List<ProductBarcodeColor> colors;
+}
+
+[System.Serializable]
+public class ProductBarcodeColor
+{
+    public string id;
+    public string productId;
+    public string sku;            // Lấy "R-000001-W" hoặc "R-000001-R"
+    public string colorId;
+    public string colorName;      // Lấy "White" hoặc "Red"
+    public string hexcode;
+    public double price;
+    public string model3DUrl;     // Có thể bị null, không sao cả
+    public string imageUrl;
+    public bool isActive;
 }

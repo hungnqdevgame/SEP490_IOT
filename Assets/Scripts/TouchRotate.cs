@@ -6,19 +6,24 @@ public class TouchRotate : MonoBehaviour
     public float rotationSpeed = 0.2f;
     public bool invertDirection = true;
 
+    [Header("Cấu hình Xoay từ Pi")]
+    public float smoothRotateSpeed = 5f; // Tốc độ xoay mượt
+    private Quaternion targetRotation;   // Lưu góc mục tiêu
+
     void Start()
     {
-        // 1. ĐĂNG KÝ LẮNG NGHE SỰ KIỆN TỪ RASPBERRY PI (SIGNALR)
+        // Khởi tạo góc mục tiêu bằng góc hiện tại của Model
+        targetRotation = transform.rotation;
+
         if (SignalRManager.Instance != null)
         {
             SignalRManager.Instance.OnProductRotatedEvent += OnReceiveRotationFromPi;
-            Debug.Log("✅ TouchRotate đã kết nối với SignalR để nhận góc xoay từ Pi!");
+            Debug.Log("✅ TouchRotate đã kết nối với SignalR!");
         }
     }
 
     void OnDestroy()
     {
-        // Hủy đăng ký khi object (Model) bị xóa để tránh lỗi rò rỉ bộ nhớ
         if (SignalRManager.Instance != null)
         {
             SignalRManager.Instance.OnProductRotatedEvent -= OnReceiveRotationFromPi;
@@ -27,7 +32,7 @@ public class TouchRotate : MonoBehaviour
 
     void Update()
     {
-  
+        // --- 1. XỬ LÝ VUỐT BẰNG TAY TRÊN MÀN HÌNH ---
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -35,37 +40,48 @@ public class TouchRotate : MonoBehaviour
             {
                 float x = touch.deltaPosition.x * rotationSpeed;
                 if (invertDirection) x = -x;
+
                 transform.Rotate(0, x, 0);
+                // Phải đồng bộ lại targetRotation để khi thả tay ra, model không bị giật lùi về góc cũ
+                targetRotation = transform.rotation;
             }
         }
 
-        // --- XỬ LÝ CHUỘT (Giữ nguyên) ---
+        // --- 2. XỬ LÝ CHUỘT ---
         if (Input.GetMouseButton(0))
         {
             float x = Input.GetAxis("Mouse X") * rotationSpeed * 10f;
             if (invertDirection) x = -x;
+
             transform.Rotate(0, x, 0);
+            targetRotation = transform.rotation;
+        }
+
+        // --- 3. THỰC HIỆN XOAY TỪ TỪ TỪ PI ---
+        // Lerp giúp model xoay êm ái về phía góc mục tiêu
+        if (transform.rotation != targetRotation)
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * smoothRotateSpeed);
         }
     }
 
- 
     private void OnReceiveRotationFromPi(float angle)
     {
-        /* * Tùy thuộc vào việc Raspberry Pi của bạn gửi dữ liệu kiểu gì, 
-         * bạn hãy BẬT một trong 2 cách dưới đây và XÓA cách còn lại nhé:
-         */
-        float finalAngle = (transform.rotation.y + angle) * rotationSpeed;
-   
- 
-        transform.Rotate(0, finalAngle, 0);
+        // Cộng dồn góc mới vào góc mục tiêu
+        Quaternion newTarget = targetRotation * Quaternion.Euler(0, angle, 0);
 
-
-        Debug.Log($"[TÍN HIỆU PI] Đã nhận góc {angle} độ. Đang xoay model!");
-    }
-
-    private void OnRotationFromPi(float angle)
-    {
-
-        transform.Rotate(0, angle, 0);
+        // NẾU LÀ 90 HOẶC -90 -> SNAP (XOAY NGAY LẬP TỨC)
+        if (Mathf.Abs(angle) == 90f)
+        {
+            targetRotation = newTarget;
+            transform.rotation = targetRotation; // Ép vào góc mới luôn
+            Debug.Log($"[XOAY] Đã bẻ tức thì góc {angle} độ.");
+        }
+        else
+        {
+            // CÁC GÓC KHÁC -> CHỈ CẬP NHẬT MỤC TIÊU ĐỂ UPDATE TỰ XOAY TỪ TỪ
+            targetRotation = newTarget;
+            Debug.Log($"[XOAY] Đang vặn từ từ góc {angle} độ.");
+        }
     }
 }
