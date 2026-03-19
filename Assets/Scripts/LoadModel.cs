@@ -13,7 +13,7 @@ public class BypassCertificate : CertificateHandler
 public class LoadModel : MonoBehaviour
 {
    
-    public string assetName = "robot";
+    public string assetName ;
     private GameObject currentModel;
 
     void Start()

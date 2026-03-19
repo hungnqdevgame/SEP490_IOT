@@ -3,21 +3,20 @@ using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Networking;
 
 public class SignalRManager : MonoBehaviour
 {
     public static SignalRManager Instance;
 
-
-    // THAY IP NÀY BẰNG IP LAPTOP CỦA BẠN
-    public string serverUrl ;
-
+    public string serverUrl;
     private HubConnection connection;
 
-    // Sự kiện để báo cho App Hiển Thị biết
     public event Action<string> OnProductReceived;
     public event Action<float> OnProductRotatedEvent;
+
+    // [THÊM MỚI] Sự kiện dành riêng cho chữ Hello
+    public event Action<string> OnMessageReceivedEvent;
+
     void Awake()
     {
         if (Instance == null)
@@ -37,28 +36,17 @@ public class SignalRManager : MonoBehaviour
         connection = new HubConnectionBuilder()
              .WithUrl(serverUrl, options =>
              {
-                 // THÊM ĐOẠN NÀY ĐỂ SỬA LỖI "SENDING REQUEST ERROR"
                  options.SkipNegotiation = true;
                  options.Transports = HttpTransportType.WebSockets;
              })
              .WithAutomaticReconnect()
              .Build();
 
-        // --- PHẦN DÀNH CHO MÁY B (Màn hình) ---
-        connection.On<string>("OnProductSelected", (skuCode) =>
+        connection.On<string>("OnProductSelected", (barCode) =>
         {
-            // 1. DÒNG NÀY CHẠY NGAY KHI SERVER GỬI TIN (Ở luồng phụ)
-            Debug.LogError($"[BƯỚC 1] SignalR đã nhận tín hiệu từ Server! Raw ID: {skuCode}");
-
             MainThreadDispatcher.Enqueue(() =>
             {
-                // 2. DÒNG NÀY CHẠY KHI CHUYỂN VỀ LUỒNG CHÍNH UNITY
-                Debug.LogError($"[BƯỚC 2] MainThreadDispatcher đang xử lý: {skuCode}");
-
-                if (OnProductReceived == null)
-                    Debug.LogError("[LỖI] Không có ai đăng ký lắng nghe sự kiện OnProductReceived cả!");
-                else
-                    OnProductReceived.Invoke(skuCode);
+                OnProductReceived?.Invoke(barCode);
             });
         });
 
@@ -66,10 +54,19 @@ public class SignalRManager : MonoBehaviour
         {
             MainThreadDispatcher.Enqueue(() =>
             {
-                // Rút gọn cách gọi hàm (Dấu ? thay cho if != null)
                 OnProductRotatedEvent?.Invoke(angle);
             });
         });
+
+        // [THÊM MỚI] Nhận tín hiệu HelloGuest từ Server
+        connection.On<string>("ReceiveMessage", (text) =>
+        {
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                OnMessageReceivedEvent?.Invoke(text);
+            });
+        });
+
         Connect();
     }
 
@@ -86,47 +83,29 @@ public class SignalRManager : MonoBehaviour
         }
     }
 
-    // --- PHẦN DÀNH CHO MÁY A (Điều khiển) ---
-    // Hàm này được gọi khi bấm nút trên điện thoại A
-    public async Task SendSelectProduct(string skuCode)
+    public async Task SendSelectProduct(string barCode)
     {
         if (connection.State == HubConnectionState.Connected)
         {
-            await connection.InvokeAsync("SelectProduct", skuCode);
-            Debug.Log("Máy A đã gửi lệnh: " + skuCode);
+            await connection.InvokeAsync("SelectProduct", barCode);
         }
     }
 
-    // Hàm này Unity tự gọi khi bạn tắt Game hoặc tắt ứng dụng
-    private async void OnApplicationQuit()
-    {
-        await CloseConnection();
-    }
-
-    // Hàm này Unity gọi khi Object bị hủy
-    private async void OnDestroy()
-    {
-        await CloseConnection();
-    }
+    private async void OnApplicationQuit() { await CloseConnection(); }
+    private async void OnDestroy() { await CloseConnection(); }
 
     private async Task CloseConnection()
     {
-        if (connection != null)
+        if (connection != null && connection.State != HubConnectionState.Disconnected)
         {
             try
             {
-                // Báo cho Server biết mình thoát
                 await connection.StopAsync();
-                // Hủy object để giải phóng RAM và Port
                 await connection.DisposeAsync();
                 connection = null;
                 Debug.Log("Đã đóng kết nối SignalR an toàn.");
             }
-            catch (Exception ex)
-            {
-                // Đôi khi tắt nhanh quá nó báo lỗi, nhưng không sao
-                Debug.LogWarning($"Lỗi khi đóng kết nối: {ex.Message}");
-            }
+            catch (Exception ex) { Debug.LogWarning($"Lỗi khi đóng kết nối: {ex.Message}"); }
         }
     }
 }

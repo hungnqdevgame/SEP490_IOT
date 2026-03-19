@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.59f2
-CRC: 3560490148
+CRC: 1786630909
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 76deeb3f9c89f8d770aea04a3fdf986f
+    Hash: 91b26b5b213c494392ff954aa3843308
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 30b5bda58fd3883ff5fb2657223cb45c
+    Hash: 7cd9caf7b9f47c3ac0285099104b577e
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 20e13b359c519c2d99ca5bac599b7ff7
+    Hash: f427633ff74f053e9a6c02dc58599c2e
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -27,8 +27,6 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 74
   Script: {instanceID: 0}
-- Class: 90
-  Script: {instanceID: 0}
 - Class: 91
   Script: {instanceID: 0}
 - Class: 95
@@ -43,6 +41,5 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Prefabs/S-000007-RD.prefab
-- Assets/Prefabs/S-000006-W.prefab
+- Assets/Prefabs/R-000001-R.prefab
 Dependencies: []
