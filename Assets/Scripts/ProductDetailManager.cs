@@ -18,7 +18,8 @@ public class ProductDetailManager : MonoBehaviour
 
     [Header("Chọn màu sắc (Dropdown)")]
     public TMP_Dropdown colorDropdown;
-
+    public Toggle colorToggle;
+    
     void Start()
     {
         if (DataBridge.isSlideshowMode && DataBridge.playlist != null && DataBridge.playlist.Count > 0)
@@ -263,6 +264,20 @@ public class ProductDetailManager : MonoBehaviour
 
         SceneManager.LoadScene("Product Scene");
     }
+
+    public void LoadProductScene()
+    {
+        Debug.Log("Test");
+               SceneManager.LoadScene("Product Scene");
+    }
+    //void OnEnable()
+    //{
+       
+    //    if (colorToggle != null && colorToggle.isOn)
+    //    {
+    //        gameObject.SetActive(false);
+    //    }
+    //}
 }
 
 // ==========================================
