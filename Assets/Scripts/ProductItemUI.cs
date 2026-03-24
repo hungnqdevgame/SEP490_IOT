@@ -30,16 +30,35 @@ public class ProductItemUI : MonoBehaviour
     public void DisplayProduct(ProductItem item)
     {
         gameObject.SetActive(true);
-        nameText.text = item.name;
+        if (nameText != null) nameText.text = item.name;
 
-        if (!string.IsNullOrEmpty(item.imageUrl) && item.imageUrl != "string")
+        // ==========================================
+        // LOGIC LẤY ẢNH TỪ MẢU ĐẦU TIÊN (HOẶC MẶC ĐỊNH)
+        // ==========================================
+        string targetImageUrl = "";
+
+        // 1. Ưu tiên lấy ảnh từ màu đầu tiên (nếu có mảng colors)
+        if (item.colors != null && item.colors.Count > 0 && !string.IsNullOrEmpty(item.colors[0].imageUrl) && item.colors[0].imageUrl != "string")
         {
-            StartCoroutine(DownloadImage(item.imageUrl));
+            targetImageUrl = item.colors[0].imageUrl;
+        }
+        // 2. Dự phòng: Nếu màu không có ảnh, lấy ảnh mặc định của Product
+        else if (!string.IsNullOrEmpty(item.imageUrl) && item.imageUrl != "string")
+        {
+            targetImageUrl = item.imageUrl;
+        }
+
+        // 3. Tiến hành tải ảnh nếu tìm thấy URL hợp lệ
+        if (!string.IsNullOrEmpty(targetImageUrl))
+        {
+            StartCoroutine(DownloadImage(targetImageUrl));
         }
         else
         {
-            productImage.color = Color.gray;
+            // Nếu không có bất kỳ ảnh nào, tô màu xám báo hiệu rỗng
+            if (productImage != null) productImage.color = Color.gray;
         }
+        // ==========================================
 
         if (showButton != null)
         {
@@ -85,10 +104,20 @@ public class ProductItemUI : MonoBehaviour
         using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
         {
             yield return request.SendWebRequest();
+
             if (request.result == UnityWebRequest.Result.Success)
             {
-                productImage.texture = DownloadHandlerTexture.GetContent(request);
-                productImage.color = Color.white;
+                // Kiểm tra xem productImage có bị xóa/hủy trong lúc chờ mạng tải không
+                if (productImage != null)
+                {
+                    productImage.texture = DownloadHandlerTexture.GetContent(request);
+                    productImage.color = Color.white;
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[LỖI TẢI ẢNH UI] Link: {url} | Lỗi: {request.error}");
+                if (productImage != null) productImage.color = Color.gray;
             }
         }
     }
