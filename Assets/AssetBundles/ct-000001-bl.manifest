@@ -1,0 +1,43 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.59f2
+CRC: 1443046514
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 3c9eff817cb5057b96e1ec572a806f72
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: d9ba6ce6ae0f42f57952f2f98b68c781
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 07c4d9f56adea91aaf4ae73a42bec738
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
+- Class: 91
+  Script: {instanceID: 0}
+- Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: d21f8b2414928ea4a8698bb802191822, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 137
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Prefabs/CT-000001-BL.prefab
+Dependencies: []
