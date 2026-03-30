@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 public class CategoryDropdownManager : MonoBehaviour
 {
     [Header("API Config")]
-    public string categoryApiUrl = "http://localhost:5035/api/ProductCategory";
+    public string categoryApiUrl = "https://toyshelf-backend.onrender.com/api/ProductCategory";
 
     [Header("UI References")]
     public TMP_Dropdown categoryDropdown;

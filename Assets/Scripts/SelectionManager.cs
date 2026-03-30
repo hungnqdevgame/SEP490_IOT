@@ -78,7 +78,8 @@ public class SelectionManager : MonoBehaviour
                         {
                             assetName = data.name,
                             modelUrl = correctSku,
-                            sku = correctSku
+                            sku = correctSku,
+                            fullProductData = data
                         };
 
                         UpdateSelection(newItem, isOn);

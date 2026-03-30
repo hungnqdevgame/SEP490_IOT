@@ -8,34 +8,28 @@ using UnityEngine.UI;
 
 public class ProductDetailManager : MonoBehaviour
 {
-    [Header("Giao diện thông tin")]
-    public TextMeshProUGUI nameText;  // Kéo chữ "WIBU" to nhất vào đây
-    public TextMeshProUGUI priceText; // Kéo chữ "200 ĐỒNG" vào đây
-    public TextMeshProUGUI typeText;  // Loại
-    public TextMeshProUGUI brandText; // Hãng
+    [Header("Giao diện thông vịn")]
+    public TextMeshProUGUI nameText;
+    public TextMeshProUGUI priceText;
+    public TextMeshProUGUI typeText;
+    public TextMeshProUGUI brandText;
     public TextMeshProUGUI materialText;
     public TextMeshProUGUI ageText;
 
     [Header("Chọn màu sắc (Dropdown)")]
     public TMP_Dropdown colorDropdown;
     public Toggle colorToggle;
-    
+
     void Start()
     {
         if (DataBridge.isSlideshowMode && DataBridge.playlist != null && DataBridge.playlist.Count > 0)
         {
             Debug.Log("[MÀN 2] Khởi động chế độ Trình Chiếu (Slideshow)!");
-
-            // Ẩn Dropdown chọn màu đi vì máy sẽ tự động chiếu
-            if (colorDropdown != null) colorDropdown.gameObject.SetActive(false);
-
-            // Bắt đầu luồng chiếu tự động
+            // ĐÃ XÓA LỆNH ẨN DROPDOWN Ở ĐÂY ĐỂ DROPDOWN LUÔN HIỆN
             StartCoroutine(PlaySlideshowRoutine());
         }
-        // 2. NẾU KHÔNG PHẢI SLIDESHOW, THÌ CHIẾU 1 SẢN PHẨM BÌNH THƯỜNG
         else if (DataBridge.selectedProduct != null)
         {
-            Debug.Log($"[MÀN 2] Đã mở balo và thấy: {DataBridge.selectedProduct.name}");
             SetupUI(DataBridge.selectedProduct);
         }
         else
@@ -44,165 +38,117 @@ public class ProductDetailManager : MonoBehaviour
         }
     }
 
-    private void SetupUI(ProductItem product)
+    // Hàm SetupUI giờ sẽ nhận thêm tham số currentSku để biết đang chiếu màu nào
+    private void SetupUI(ProductItem product, string currentSku = "")
     {
-        // 1. ĐỔI TOÀN BỘ CHỮ TRÊN MÀN HÌNH BẰNG DATA THẬT
         if (nameText != null) nameText.text = product.name;
-        if (priceText != null) priceText.text = product.price.ToString("N0") + " ĐỒNG";
-
-        // Fix: Lấy chữ từ Data đắp lên giao diện
-        if (brandText != null) brandText.text = product.brand;
-        if (materialText != null) materialText.text = product.material;
-        if (ageText != null) ageText.text = product.ageRange;
+        if (priceText != null) priceText.text ="Giá tiền :/n" + product.price.ToString("N0") + " ĐỒNG";
+        if (brandText != null) brandText.text ="Hãng " +  product.brand;
+        if (materialText != null) materialText.text = "Chất liệu " + product.material;
+        if (ageText != null) ageText.text = "Độ tuổi  " + product.ageRange;
 
         if (typeText != null)
         {
-            typeText.text = "Đang tải..."; // Hiển thị chữ tạm trong lúc chờ mạng
-
-            if (!string.IsNullOrEmpty(product.productCategoryId))
-            {
-                // Gọi luồng phụ tải tên Category từ API
-                StartCoroutine(FetchCategoryName(product.productCategoryId));
-            }
-            else
-            {
-                typeText.text = "Chưa phân loại";
-            }
+            typeText.text = "Đang tải...";
+            if (!string.IsNullOrEmpty(product.productCategoryId)) StartCoroutine(FetchCategoryName(product.productCategoryId));
+            else typeText.text = "Chưa phân loại";
         }
 
-        // 2. XỬ LÝ DROPDOWN CHỌN MÀU BẰNG API
+        // --- CẬP NHẬT DROPDOWN ---
         if (colorDropdown != null)
         {
             colorDropdown.ClearOptions();
-
             if (product.colors != null && product.colors.Count > 0)
             {
                 colorDropdown.gameObject.SetActive(true);
-                // Đặt chữ tạm trong lúc gọi mạng
                 colorDropdown.AddOptions(new List<string> { "Đang tải màu..." });
-
-                // Bắt đầu gọi API lấy tên màu
-                StartCoroutine(FetchColorNamesAndSetupDropdown(product));
+                StartCoroutine(FetchColorNamesAndSetupDropdown(product, currentSku));
             }
             else
             {
                 colorDropdown.gameObject.SetActive(false);
-                OnColorSelected(product.model3DUrl);
+                if (!DataBridge.isSlideshowMode) OnColorSelected(product.model3DUrl);
             }
         }
-        else if (product.colors != null && product.colors.Count > 0)
+        else if (product.colors != null && product.colors.Count > 0 && !DataBridge.isSlideshowMode)
         {
-            OnColorSelected(product.colors[0].model3DUrl);
+            OnColorSelected(product.colors[0].sku);
         }
     }
 
-    // ==========================================
-    // HÀM MỚI: TẢI TÊN MÀU TỪ API
-    // ==========================================
-    private IEnumerator FetchColorNamesAndSetupDropdown(ProductItem product)
+    private IEnumerator FetchColorNamesAndSetupDropdown(ProductItem product, string currentSku)
     {
         List<string> options = new List<string>();
 
         foreach (var colorData in product.colors)
         {
-            // Nếu có colorId thì gọi API
             if (!string.IsNullOrEmpty(colorData.colorId))
             {
-                string url = "http://localhost:5035/api/Color/" + colorData.colorId;
+                string url = "https://toyshelf-backend.onrender.com/api/Color/" + colorData.colorId;
                 using (UnityWebRequest request = UnityWebRequest.Get(url))
                 {
                     yield return request.SendWebRequest();
-
                     if (request.result == UnityWebRequest.Result.Success)
                     {
                         var response = JsonUtility.FromJson<SingleColorResponse>(request.downloadHandler.text);
-                        if (response != null && response.data != null)
-                        {
-                            // Lấy được tên màu thành công (VD: White, Red)
-                            options.Add("Màu: " + response.data.name);
-                        }
-                        else
-                        {
-                            options.Add("Màu: " + colorData.sku); // Lỗi JSON thì dùng tạm SKU
-                        }
+                        if (response != null && response.data != null) options.Add("Màu: " + response.data.name);
+                        else options.Add("Màu: " + colorData.sku);
                     }
-                    else
-                    {
-                        options.Add("Màu: " + colorData.sku); // Lỗi mạng dùng tạm SKU
-                    }
+                    else options.Add("Màu: " + colorData.sku);
                 }
             }
-            else
-            {
-                options.Add("Màu: " + colorData.sku); // Không có ID màu dùng tạm SKU
-            }
+            else options.Add("Màu: " + colorData.sku);
         }
 
-        // Sau khi gom đủ tên, cập nhật Dropdown
         colorDropdown.ClearOptions();
         colorDropdown.AddOptions(options);
 
-        // Đăng ký sự kiện chọn
+        // Tìm vị trí màu đang được chiếu để chỉnh Dropdown khớp với 3D Model
+        int selectedIndex = 0;
+        if (!string.IsNullOrEmpty(currentSku))
+        {
+            selectedIndex = product.colors.FindIndex(c => c.sku == currentSku);
+            if (selectedIndex == -1) selectedIndex = 0;
+        }
+
+        colorDropdown.SetValueWithoutNotify(selectedIndex); // Hiển thị giá trị chuẩn
+
         colorDropdown.onValueChanged.RemoveAllListeners();
         colorDropdown.onValueChanged.AddListener((index) =>
         {
             OnColorSelected(product.colors[index].sku);
         });
 
-        // Bắt đầu tải Model 3D của màu ĐẦU TIÊN
-        OnColorSelected(product.colors[0].sku);
+        // Chỉ tải model 1 lần duy nhất để tránh giật lag
+        if (!DataBridge.isSlideshowMode)
+        {
+            OnColorSelected(product.colors[selectedIndex].sku);
+        }
     }
 
     private void OnColorSelected(string modelUrl)
     {
-        //// Chống lỗi rỗng: Nếu API không có tên model, mặc định gọi file "robot"
-        //if (string.IsNullOrEmpty(modelUrl) || modelUrl == "string") modelUrl = "robot";
-
-        Debug.Log($"[MÀN 2] Đã chọn màu! Đang gọi tải Model 3D: {modelUrl}");
-
-        // 1. Tìm thợ tải Model (LoadModel) đang có mặt trong Màn 2
         LoadModel modelLoader = FindFirstObjectByType<LoadModel>();
-
         if (modelLoader != null)
         {
-            // 2. Ghép link server với tên model
-            string bundleServerUrl = "http://localhost:5035/";
-            string fullBundleUrl = bundleServerUrl + modelUrl;
-
-            // 3. Ra lệnh tải file AssetBundle từ mạng về!
-            modelLoader.DownloadAndShow(fullBundleUrl, modelUrl);
-        }
-        else
-        {
-            Debug.LogError("❌ LỖI: Không tìm thấy script LoadModel ở Màn 2! Đảm bảo GameManager có gắn LoadModel.");
+            string bundleServerUrl = "https://toyshelf-backend.onrender.com/";
+            string fullBundleUrl = bundleServerUrl + modelUrl.ToLower();
+            modelLoader.DownloadAndShow(fullBundleUrl, modelUrl.ToLower());
         }
     }
 
-    
-
     private IEnumerator FetchCategoryName(string categoryId)
     {
-        string url = "http://localhost:5035/api/ProductCategory/" + categoryId;
-
+        string url = "https://toyshelf-backend.onrender.com/api/ProductCategory/" + categoryId;
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
-
             if (request.result == UnityWebRequest.Result.Success)
             {
                 var response = JsonUtility.FromJson<SingleCategoryResponse>(request.downloadHandler.text);
-
-                if (response != null && response.data != null)
-                {
-                    typeText.text = response.data.name;
-                    Debug.Log($"[API] Đã dịch Category ID thành tên: {response.data.name}");
-                }
+                if (response != null && response.data != null) typeText.text = response.data.name;
             }
-            else
-            {
-                Debug.LogError("Lỗi gọi API Category: " + request.error);
-                typeText.text = "Lỗi kết nối";
-            }
+            else typeText.text = "Lỗi kết nối";
         }
     }
 
@@ -211,73 +157,45 @@ public class ProductDetailManager : MonoBehaviour
         LoadModel modelLoader = FindFirstObjectByType<LoadModel>();
         if (modelLoader == null) yield break;
 
-        string bundleServerUrl = "http://localhost:5035/";
+        string bundleServerUrl = "https://toyshelf-backend.onrender.com/";
         int currentIndex = 0;
 
-        // Vòng lặp vô hạn: Chiếu hết danh sách tự động quay lại đầu
         while (true)
         {
             var currentItem = DataBridge.playlist[currentIndex];
 
-            // Cập nhật tên sản phẩm trên màn hình
-            if (nameText != null) nameText.text = currentItem.assetName;
-
-            // Xử lý link tải 
-            string skuUrl = currentItem.modelUrl;
-
-            // ==========================================
-            // LẮP LẠI BỘ BẢO HIỂM CHỐNG LỖI 404 (QUAN TRỌNG)
-            // ==========================================
-            if (string.IsNullOrEmpty(skuUrl) || skuUrl.Trim() == "")
+            // 1. GỌI SETUP UI ĐỂ VỪA IN THÔNG TIN VỪA TẠO DROPDOWN MÀU
+            if (currentItem.fullProductData != null)
             {
-                skuUrl = "robot"; // Tự động vá lỗi bằng tên file mặc định
-                Debug.LogWarning($"[CẢNH BÁO] Link tải bị rỗng! Đã tự động vá lỗi thành: {skuUrl}");
+                SetupUI(currentItem.fullProductData, currentItem.sku);
             }
+            else if (nameText != null) nameText.text = currentItem.assetName;
 
-            string fullBundleUrl = bundleServerUrl + skuUrl;
+            // 2. Tải model 3D hiển thị
+            string skuUrl = currentItem.modelUrl;
+            if (string.IsNullOrEmpty(skuUrl) || skuUrl.Trim() == "") skuUrl = "robot";
+            string fullBundleUrl = bundleServerUrl + skuUrl.ToLower();
+            modelLoader.DownloadAndShow(fullBundleUrl, skuUrl.ToLower());
 
-            Debug.Log($"[SLIDESHOW] Đang tải {currentItem.assetName}. Thời gian chiếu: {currentItem.displayDuration} giây.");
-
-            // Tải mô hình
-            modelLoader.DownloadAndShow(fullBundleUrl, skuUrl);
-
-            // Bắt Unity đợi đúng số giây bạn đã nhập
+            // 3. Đợi đủ số giây rồi chuyển sang món đồ chơi tiếp theo
             yield return new WaitForSeconds(currentItem.displayDuration);
 
-            // Chuyển sang món đồ chơi tiếp theo
             currentIndex++;
-            if (currentIndex >= DataBridge.playlist.Count)
-            {
-                currentIndex = 0; // Quay về đầu danh sách
-            }
+            if (currentIndex >= DataBridge.playlist.Count) currentIndex = 0;
         }
     }
 
     public void BackToScene1()
     {
-        // ==========================================
-        // DỌN SẠCH BALO TRƯỚC KHI VỀ MÀN 1
-        // (Để hệ thống không bị kẹt data rỗng của lần chạy cũ)
-        // ==========================================
         DataBridge.isSlideshowMode = false;
         if (DataBridge.playlist != null) DataBridge.playlist.Clear();
-
         SceneManager.LoadScene("Product Scene");
     }
 
     public void LoadProductScene()
     {
-        Debug.Log("Test");
-               SceneManager.LoadScene("Product Scene");
+        SceneManager.LoadScene("Product Scene");
     }
-    //void OnEnable()
-    //{
-       
-    //    if (colorToggle != null && colorToggle.isOn)
-    //    {
-    //        gameObject.SetActive(false);
-    //    }
-    //}
 }
 
 // ==========================================

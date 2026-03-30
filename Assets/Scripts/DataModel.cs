@@ -48,6 +48,8 @@ public class ColorItem
     public string imageUrl;
     public double price;
     public string colorId;
+    public string colorName;
+    public string hexcode;
 }
 
 [Serializable]
@@ -72,7 +74,9 @@ public class ModelPlaylistItem
     public string modelUrl;       // Đường dẫn đến file robot hoặc .glb trên Render
     public string assetName;      // Tên Prefab (ví dụ: KyleRobot)
     public float displayDuration; // Thời gian hiển thị (giây)
-    public string sku;             // SKU để gọi API (ví dụ: S-000005-W)    
+    public string sku;
+
+    public ProductItem fullProductData;
 }
 
 // THÊM 2 CLASS NÀY ĐỂ ĐỌC API CATEGORY ĐƠN LẺ

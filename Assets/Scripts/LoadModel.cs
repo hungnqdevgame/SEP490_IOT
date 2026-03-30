@@ -1,128 +1,106 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic; // Bổ sung thư viện quản lý Kho (Dictionary)
+using System.IO;
 
 public class BypassCertificate : CertificateHandler
 {
-    protected override bool ValidateCertificate(byte[] certificateData)
-    {
-        return true;
-    }
+    protected override bool ValidateCertificate(byte[] certificateData) { return true; }
 }
 
 public class LoadModel : MonoBehaviour
 {
-   
-    public string assetName ;
+    public string assetName;
     private GameObject currentModel;
 
-    void Start()
-    {
-    
-     
-     
-    }
+    // [VŨ KHÍ MỚI] Kho RAM: Cất giữ các model đã tải để bật/tắt tức thì
+    private Dictionary<string, GameObject> ramCache = new Dictionary<string, GameObject>();
 
-    public void DownloadAndShow(string bundleUrl, string assetName )
+    void Start() { }
+
+    public void DownloadAndShow(string bundleUrl, string assetName)
     {
-        Debug.Log("Bắt đầu tải AssetBundle từ: " + bundleUrl);
         StartCoroutine(DownloadAndPlace(bundleUrl, assetName));
     }
 
-    //IEnumerator DownloadAndPlace()
-    //{
-    //    using (UnityWebRequest uwr = UnityWebRequestAssetBundle.GetAssetBundle(bundleURL))
-    //    {
-    //        uwr.certificateHandler = new BypassCertificate();
-
-    //        yield return uwr.SendWebRequest();
-
-    //        if (uwr.result != UnityWebRequest.Result.Success)
-    //        {
-    //            Debug.LogError("LỖI MẠNG THỰC SỰ: " + uwr.responseCode + " - " + uwr.error);
-    //        }
-    //        else
-    //        {
-    //            Debug.Log("Tải thành công! Đang giải nén model...");
-    //            AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(uwr);
-
-    //            if (bundle != null)
-    //            {
-    //                GameObject prefab = bundle.LoadAsset<GameObject>(assetName);
-    //                if (prefab != null)
-    //                {
-    //                    Instantiate(prefab);
-    //                    Debug.Log("Đã hiển thị Robot lên màn hình!");
-    //                }
-    //                else
-    //                {
-    //                    Debug.LogError("Không tìm thấy Asset nào tên là: " + assetName + " trong bundle này.");
-    //                }
-    //                bundle.Unload(false);
-    //            }
-    //        }
-    //    }
-    //}
-
     IEnumerator DownloadAndPlace(string bundleURL, string assetName)
     {
-        // 1. Xóa model cũ đi trước khi tải
-        if (currentModel != null) Destroy(currentModel);
-        foreach (Transform child in transform) Destroy(child.gameObject);
-
-        // 2. Tiến hành tải Bundle
-        using (UnityWebRequest uwr = UnityWebRequestAssetBundle.GetAssetBundle(bundleURL))
+        // ==========================================================
+        // TẦNG 1: KIỂM TRA RAM CACHE (TỐC ĐỘ 0 GIÂY)
+        // ==========================================================
+        if (ramCache.ContainsKey(assetName) && ramCache[assetName] != null)
         {
-            uwr.certificateHandler = new BypassCertificate();
+            // Tắt tất cả các đồ chơi đang hiển thị trên màn hình (thay vì Destroy chúng)
+            foreach (Transform child in transform) child.gameObject.SetActive(false);
 
-            yield return uwr.SendWebRequest();
+            // Bật con robot đã lưu trong Kho RAM lên
+            currentModel = ramCache[assetName];
+            currentModel.SetActive(true);
 
-            if (uwr.result != UnityWebRequest.Result.Success)
+            Debug.Log($"⚡ [RAM] Đã bật {assetName} ngay lập tức (0 giây delay)!");
+            yield break; // NGỪNG CODE TẠI ĐÂY! Không cần đọc ổ cứng hay mạng nữa.
+        }
+
+        // Nếu RAM chưa có, ta phải dọn dẹp màn hình (Tắt các model cũ đi) để chuẩn bị load con mới
+        foreach (Transform child in transform) child.gameObject.SetActive(false);
+
+        string savePath = Path.Combine(Application.persistentDataPath, assetName + ".bundle");
+
+        // ==========================================================
+        // TẦNG 2: KIỂM TRA MẠNG VÀ TẢI VÀO Ổ CỨNG (NẾU CHƯA CÓ)
+        // ==========================================================
+        if (!File.Exists(savePath))
+        {
+            Debug.Log($"[NETWORK] Tải từ Server về máy...");
+            using (UnityWebRequest uwr = UnityWebRequest.Get(bundleURL))
             {
-                Debug.LogError("LỖI MẠNG TẢI BUNDLE: " + uwr.responseCode + " - " + uwr.error);
-            }
-            else
-            {
-                Debug.Log("Tải thành công! Đang giải nén model...");
-                AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(uwr);
+                uwr.certificateHandler = new BypassCertificate();
+                yield return uwr.SendWebRequest();
 
-                if (bundle != null)
+                if (uwr.result != UnityWebRequest.Result.Success)
                 {
-                    // [TÙY CHỌN] In ra cửa sổ Console tất cả các tên file có trong Bundle để bạn kiểm tra
-                    string[] allNames = bundle.GetAllAssetNames();
-                    Debug.Log("Tên thật của các file trong Bundle này là: " + string.Join(", ", allNames));
-
-                    // [BÍ QUYẾT TỐI ƯU] Không cần tìm theo tên nữa, lôi hết GameObject ra và lấy cái đầu tiên!
-                    GameObject[] allPrefabs = bundle.LoadAllAssets<GameObject>();
-
-                    if (allPrefabs != null && allPrefabs.Length > 0)
-                    {
-                        GameObject prefab = allPrefabs[0];
-
-                        currentModel = Instantiate(prefab, transform);
-
-                        // 1. Gán CHÍNH XÁC Position (Y = 0.7, Z = -7)
-                        // Lưu ý: Cần thêm chữ 'f' ở sau số thập phân trong C#
-                        currentModel.transform.localPosition = new Vector3(0f, 0.7f, -7f);
-
-                        // 2. Gán CHÍNH XÁC Rotation (Quay mặt 180 độ)
-                        currentModel.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
-
-                        // 3. Gán CHÍNH XÁC Scale (1, 1, 1) cho chắc chắn không bị phóng to/thu nhỏ
-                        currentModel.transform.localScale = new Vector3(1f, 1f, 1f);
-
-                        Debug.Log($"🎉 Đã hiển thị thành công Model: {prefab.name} lên đúng vị trí!");
-                    }
-                    else
-                    {
-                        Debug.LogError("Bundle này tải về được nhưng bên trong trống rỗng, không có Model 3D nào cả!");
-                    }
-
-                    // Bắt buộc phải Unload để tránh rò rỉ bộ nhớ
-                    bundle.Unload(false);
+                    Debug.LogError("❌ LỖI MẠNG: " + uwr.error);
+                    yield break; // Rớt mạng thì nghỉ
                 }
+                File.WriteAllBytes(savePath, uwr.downloadHandler.data);
             }
         }
-    }
 
+        // ==========================================================
+        // TẦNG 3: ĐỌC TỪ Ổ CỨNG VÀ ÉP HIỂN THỊ (BỎ CHẾ ĐỘ ASYNC)
+        // ==========================================================
+        Debug.Log("[HARD DRIVE] Đang đọc file ép buộc...");
+
+        // Dùng lệnh đọc đồng bộ (Synchronous) - Bắt máy tính nặn ra model ngay lập tức
+        AssetBundle bundle = AssetBundle.LoadFromFile(savePath);
+
+        if (bundle == null)
+        {
+            Debug.LogError("❌ Lỗi file hỏng!");
+            if (File.Exists(savePath)) File.Delete(savePath); // Xóa file hỏng
+            yield break;
+        }
+
+        // Lấy model ra ngay lập tức
+        GameObject[] allPrefabs = bundle.LoadAllAssets<GameObject>();
+
+        if (allPrefabs != null && allPrefabs.Length > 0)
+        {
+            GameObject prefab = allPrefabs[0];
+
+            currentModel = Instantiate(prefab, transform);
+            currentModel.transform.localPosition = new Vector3(0f, 0.7f, -7f);
+            currentModel.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+            currentModel.transform.localScale = new Vector3(1f, 1f, 1f);
+
+            // QUAN TRỌNG: Lưu con robot vừa tạo vào KHO RAM
+            ramCache.Add(assetName, currentModel);
+
+            Debug.Log($"🚀 Đã tạo thành công {assetName} và lưu vào KHO RAM!");
+        }
+
+        // Dọn rác
+        bundle.Unload(false);
+    }
 }
