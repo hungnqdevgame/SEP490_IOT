@@ -12,7 +12,7 @@ public class ProductManager : MonoBehaviour
     public static ProductManager Instance;
 
     [Header("=== CẤU HÌNH API ===")]
-    public string baseUrl = "http://localhost:5035/api/Product/paginated";
+    public string baseUrl = "https://toyshelf-backend.onrender.com/api/Product/paginated";
     public int pageSize = 4;
 
     [Header("=== GIAO DIỆN CHUYỂN TRANG & TÌM KIẾM ===")]

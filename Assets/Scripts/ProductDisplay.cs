@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI; // Thêm thư viện UI
 
 public class ProductDisplay : MonoBehaviour
 {
@@ -15,8 +16,11 @@ public class ProductDisplay : MonoBehaviour
     public TextMeshProUGUI materialText;
     public TextMeshProUGUI ageText;
 
-    [Header("=== CHỌN MÀU SẮC ===")]
-    public TMP_Dropdown colorDropdown;
+    [Header("=== CAROUSEL MÀU SẮC ===")]
+    // Bỏ TMP_Dropdown colorDropdown đi, thay bằng 3 biến này:
+    public GameObject colorCardPrefab;       // Kéo Prefab RobotCard (đã gắn ColorCardUI) vào đây
+    public Transform carouselContent;        // Kéo GameObject 'Content' của Scroll View vào đây
+    public CarouselController carouselScript;// Kéo Script CarouselController vào đây
 
     [Header("=== HỆ THỐNG TẢI MODEL ===")]
     public LoadModel modelLoader;
@@ -31,6 +35,7 @@ public class ProductDisplay : MonoBehaviour
         {
             SignalRManager.Instance.OnProductReceived += HandleProductReceived;
         }
+        Debug.Log(apiUrlGetBySku);
     }
 
     void OnDestroy()
@@ -51,10 +56,6 @@ public class ProductDisplay : MonoBehaviour
         barCode = barCode.Trim();
         Debug.Log($"[TÍN HIỆU] Đã nhận Barcode: {barCode}. Đang tiến hành gọi API...");
 
-        // Xóa model cũ
-        foreach (Transform child in transform) Destroy(child.gameObject);
-
-        // Bắt đầu tải dữ liệu mới
         StartCoroutine(FetchUrlAndLoadModel(barCode));
     }
 
@@ -68,16 +69,28 @@ public class ProductDisplay : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                var response = JsonUtility.FromJson<ProductBarcodeResponse>(request.downloadHandler.text);
+                // In chuỗi JSON gốc ra để kiểm tra
+                string rawJson = request.downloadHandler.text;
+                Debug.Log($"[RAW JSON TỪ API]: \n{rawJson}");
 
-                if (response != null && response.data != null)
+                try
                 {
-                    // GỌI HÀM CẬP NHẬT GIAO DIỆN (UI)
-                    SetupUI(response.data);
+                    // DÙNG LẠI JSONUTILITY: Vì bạn đã gắn [System.Serializable] rất chuẩn rồi!
+                    var response = JsonUtility.FromJson<ProductBarcodeResponse>(rawJson);
+
+                    if (response != null && response.data != null && !string.IsNullOrEmpty(response.data.id))
+                    {
+                        Debug.Log($"[THÀNH CÔNG] Đã bóc tách được sản phẩm: {response.data.name}");
+                        SetupUI(response.data);
+                    }
+                    else
+                    {
+                        Debug.LogError("[LỖI PARSE] JsonUtility trả về null. Hãy xem lại log [RAW JSON] ở trên xem API có trả đúng cấu trúc không nhé.");
+                    }
                 }
-                else
+                catch (System.Exception e)
                 {
-                    Debug.LogWarning($"[API] Phân tích JSON thất bại hoặc data bị null cho Barcode {barCode}.");
+                    Debug.LogError($"[NGOẠI LỆ PARSE JSON] {e.Message}");
                 }
             }
             else
@@ -86,20 +99,15 @@ public class ProductDisplay : MonoBehaviour
             }
         }
     }
-
-    // ==========================================
-    // HÀM MỚI: CẬP NHẬT GIAO DIỆN VÀ DROPDOWN
-    // ==========================================
     private void SetupUI(ProductBarcodeData data)
     {
-        // 1. Đổ dữ liệu vào các ô chữ
+        // 1. Đổ dữ liệu Text (Giữ nguyên của bạn)
         if (nameText != null) nameText.text = data.name;
-        if (priceText != null) priceText.text = data.basePrice.ToString("N0") + " ĐỒNG";
-        if (brandText != null) brandText.text = data.brand;
-        if (materialText != null) materialText.text = data.material;
-        if (ageText != null) ageText.text = data.ageRange;
+        if (priceText != null) priceText.text = "Giá : "+ data.basePrice.ToString("N0") + " ĐỒNG";
+        if (brandText != null) brandText.text = "Hãng :" + data.brand;
+        if (materialText != null) materialText.text = "Chất liệu :"+data.material;
+        if (ageText != null) ageText.text = "Độ tuổi : " + data.ageRange;
 
-        // Xử lý Loại sản phẩm (Category)
         if (typeText != null)
         {
             typeText.text = "Đang tải...";
@@ -109,88 +117,85 @@ public class ProductDisplay : MonoBehaviour
                 typeText.text = "Chưa phân loại";
         }
 
-        // 2. Xử lý Dropdown Màu Sắc
-        if (colorDropdown != null)
+        // 2. TẠO THẺ MÀU SẮC CHO CAROUSEL
+        if (carouselContent != null && colorCardPrefab != null)
         {
-            colorDropdown.ClearOptions();
+            // Xóa các thẻ cũ nếu tải sản phẩm mới
+            foreach (Transform child in carouselContent) Destroy(child.gameObject);
+
+            // Xóa list trong script Carousel
+            if (carouselScript != null)
+            {
+                carouselScript.cards.Clear();
+                carouselScript.canvasGroups.Clear();
+            }
 
             if (data.colors != null && data.colors.Count > 0)
             {
-                colorDropdown.gameObject.SetActive(true);
-                List<string> options = new List<string>();
-
                 foreach (var colorData in data.colors)
                 {
-                    // Lấy trực tiếp tên màu từ JSON mới, KHÔNG CẦN gọi thêm API màu nữa!
+                    // Đẻ ra 1 cái thẻ mới
+                    GameObject newCard = Instantiate(colorCardPrefab, carouselContent);
+
+                    // Lấy component để đổ data (Tên và Ảnh)
+                    ColorCardUI cardUI = newCard.GetComponent<ColorCardUI>();
                     string cName = !string.IsNullOrEmpty(colorData.colorName) ? colorData.colorName : colorData.sku;
-                    options.Add("Màu: " + cName);
+                    cardUI.SetupCard(cName, colorData.imageUrl);
+
+                    // Khai báo thẻ này cho hệ thống Carousel để nó làm hiệu ứng sáng/tối
+                    if (carouselScript != null)
+                    {
+                        carouselScript.cards.Add(newCard.GetComponent<RectTransform>());
+                        carouselScript.canvasGroups.Add(newCard.GetComponent<CanvasGroup>());
+                    }
+
+                    // Thêm nút bấm: Khi nhấn vào thẻ, gọi hàm OnColorSelected để tải Model 3D
+                    Button cardBtn = newCard.GetComponent<Button>();
+                    if (cardBtn == null) cardBtn = newCard.AddComponent<Button>(); // Tự thêm nếu chưa có
+
+                    // Lấy biến tạm để dùng trong sự kiện OnClick
+                    string skuToLoad = colorData.sku;
+                    cardBtn.onClick.AddListener(() => OnColorSelected(skuToLoad));
                 }
 
-                colorDropdown.AddOptions(options);
-
-                // Gắn sự kiện khi đổi màu trong Dropdown
-                colorDropdown.onValueChanged.RemoveAllListeners();
-                colorDropdown.onValueChanged.AddListener((index) =>
-                {
-                    OnColorSelected(data.colors[index].sku);
-                });
-
-                // Tự động tải 3D của màu đầu tiên
+                // Tự động hiển thị Model 3D của thẻ đầu tiên
                 OnColorSelected(data.colors[0].sku);
             }
             else
             {
-                // Nếu sản phẩm không có chia màu
-                colorDropdown.gameObject.SetActive(false);
+                // Nếu sản phẩm không chia màu
                 OnColorSelected(data.sku);
             }
         }
-        else
-        {
-            // Nếu UI không có Dropdown thì tự động tải màu đầu tiên
-            if (data.colors != null && data.colors.Count > 0) OnColorSelected(data.colors[0].sku);
-            else OnColorSelected(data.sku);
-        }
     }
 
-    private void OnColorSelected(string modelSku)
+    public void OnColorSelected(string modelSku)
     {
         if (string.IsNullOrEmpty(modelSku)) return;
 
         Debug.Log($"[HIỂN THỊ] Đã chọn màu! Đang gọi tải Model 3D: {modelSku}");
 
-        string fullBundleUrl = bundleServerUrl + modelSku;
+        string fullBundleUrl = bundleServerUrl + modelSku.ToLower();
 
         if (modelLoader != null)
         {
-            modelLoader.DownloadAndShow(fullBundleUrl, modelSku);
-        }
-        else
-        {
-            Debug.LogError("Chưa kéo tham chiếu LoadModel vào script ProductDisplay!");
+            modelLoader.DownloadAndShow(fullBundleUrl, modelSku.ToLower());
         }
     }
 
     private IEnumerator FetchCategoryName(string categoryId)
     {
+        // (Giữ nguyên logic của bạn)
         string url = "http://localhost:5035/api/ProductCategory/" + categoryId;
-
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();
-
             if (request.result == UnityWebRequest.Result.Success)
             {
                 var response = JsonUtility.FromJson<SingleCategoryResponse>(request.downloadHandler.text);
-                if (response != null && response.data != null)
-                {
-                    typeText.text = response.data.name;
-                }
+                if (response != null && response.data != null) typeText.text = "Loại : "  +  response.data.name;
             }
-            else
-            {
-                typeText.text = "Lỗi kết nối";
-            }
+            else typeText.text = "Lỗi kết nối";
         }
     }
 }
