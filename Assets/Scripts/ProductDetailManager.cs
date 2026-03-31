@@ -16,9 +16,9 @@ public class ProductDetailManager : MonoBehaviour
     public TextMeshProUGUI materialText;
     public TextMeshProUGUI ageText;
 
-    [Header("Chọn màu sắc (Dropdown)")]
-    public TMP_Dropdown colorDropdown;
-    public Toggle colorToggle;
+    //[Header("Chọn màu sắc (Dropdown)")]
+    //public TMP_Dropdown colorDropdown;
+    //public Toggle colorToggle;
 
     void Start()
     {
@@ -54,26 +54,26 @@ public class ProductDetailManager : MonoBehaviour
             else typeText.text = "Chưa phân loại";
         }
 
-        // --- CẬP NHẬT DROPDOWN ---
-        if (colorDropdown != null)
-        {
-            colorDropdown.ClearOptions();
-            if (product.colors != null && product.colors.Count > 0)
-            {
-                colorDropdown.gameObject.SetActive(true);
-                colorDropdown.AddOptions(new List<string> { "Đang tải màu..." });
-                StartCoroutine(FetchColorNamesAndSetupDropdown(product, currentSku));
-            }
-            else
-            {
-                colorDropdown.gameObject.SetActive(false);
-                if (!DataBridge.isSlideshowMode) OnColorSelected(product.model3DUrl);
-            }
-        }
-        else if (product.colors != null && product.colors.Count > 0 && !DataBridge.isSlideshowMode)
-        {
-            OnColorSelected(product.colors[0].sku);
-        }
+        //// --- CẬP NHẬT DROPDOWN ---
+        //if (colorDropdown != null)
+        //{
+        //    colorDropdown.ClearOptions();
+        //    if (product.colors != null && product.colors.Count > 0)
+        //    {
+        //        colorDropdown.gameObject.SetActive(true);
+        //        colorDropdown.AddOptions(new List<string> { "Đang tải màu..." });
+        //        StartCoroutine(FetchColorNamesAndSetupDropdown(product, currentSku));
+        //    }
+        //    else
+        //    {
+        //        colorDropdown.gameObject.SetActive(false);
+        //        if (!DataBridge.isSlideshowMode) OnColorSelected(product.model3DUrl);
+        //    }
+        //}
+        //else if (product.colors != null && product.colors.Count > 0 && !DataBridge.isSlideshowMode)
+        //{
+        //    OnColorSelected(product.colors[0].sku);
+        //}
     }
 
     private IEnumerator FetchColorNamesAndSetupDropdown(ProductItem product, string currentSku)
@@ -100,8 +100,8 @@ public class ProductDetailManager : MonoBehaviour
             else options.Add("Màu: " + colorData.sku);
         }
 
-        colorDropdown.ClearOptions();
-        colorDropdown.AddOptions(options);
+        //colorDropdown.ClearOptions();
+        //colorDropdown.AddOptions(options);
 
         // Tìm vị trí màu đang được chiếu để chỉnh Dropdown khớp với 3D Model
         int selectedIndex = 0;
@@ -111,13 +111,13 @@ public class ProductDetailManager : MonoBehaviour
             if (selectedIndex == -1) selectedIndex = 0;
         }
 
-        colorDropdown.SetValueWithoutNotify(selectedIndex); // Hiển thị giá trị chuẩn
+        //colorDropdown.SetValueWithoutNotify(selectedIndex); // Hiển thị giá trị chuẩn
 
-        colorDropdown.onValueChanged.RemoveAllListeners();
-        colorDropdown.onValueChanged.AddListener((index) =>
-        {
-            OnColorSelected(product.colors[index].sku);
-        });
+        //colorDropdown.onValueChanged.RemoveAllListeners();
+        //colorDropdown.onValueChanged.AddListener((index) =>
+        //{
+        //    OnColorSelected(product.colors[index].sku);
+        //});
 
         // Chỉ tải model 1 lần duy nhất để tránh giật lag
         if (!DataBridge.isSlideshowMode)
