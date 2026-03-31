@@ -184,7 +184,7 @@ TextureImporter:
         width: 71
         height: 60
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -193,6 +193,28 @@ TextureImporter:
       bones: []
       spriteID: 5796c4d9ebd36c84785e0057a7c99e81
       internalID: -2106737202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: screen-removebg-preview_4
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 44
+        width: 64
+        height: 59
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20687a4625f5c4b41b729f3ac46b1c4c
+      internalID: -1874758007
       vertices: []
       indices: 
       edges: []
@@ -215,6 +237,7 @@ TextureImporter:
       screen-removebg-preview_1: 446048149
       screen-removebg-preview_2: 140804977
       screen-removebg-preview_3: -2106737202
+      screen-removebg-preview_4: -1874758007
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
