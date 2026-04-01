@@ -42,10 +42,10 @@ public class ProductDetailManager : MonoBehaviour
     private void SetupUI(ProductItem product, string currentSku = "")
     {
         if (nameText != null) nameText.text = product.name;
-        if (priceText != null) priceText.text ="Giá tiền :/n" + product.price.ToString("N0") + " ĐỒNG";
-        if (brandText != null) brandText.text ="Hãng " +  product.brand;
-        if (materialText != null) materialText.text = "Chất liệu " + product.material;
-        if (ageText != null) ageText.text = "Độ tuổi  " + product.ageRange;
+        if (priceText != null) priceText.text ="Giá tiền :" + product.price.ToString("N0") + " ĐỒNG";
+        if (brandText != null) brandText.text ="Hãng : " +  product.brand;
+        if (materialText != null) materialText.text = "Chất liệu : " + product.material;
+        if (ageText != null) ageText.text = "Độ tuổi : " + product.ageRange;
 
         if (typeText != null)
         {

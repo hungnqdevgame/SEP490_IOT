@@ -9,10 +9,8 @@ public class HelloMessageDisplay : MonoBehaviour
 
     void Start()
     {
-        // Tắt chữ lúc mới vào game
         if (helloTextUI != null) helloTextUI.gameObject.SetActive(false);
 
-        // Lắng nghe tín hiệu Hello từ Pi
         if (SignalRManager.Instance != null)
         {
             SignalRManager.Instance.OnMessageReceivedEvent += HandleMessage;

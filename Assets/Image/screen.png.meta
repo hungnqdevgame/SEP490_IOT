@@ -114,12 +114,12 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 65
-        y: 387
+        y: 390
         width: 246
-        height: 248
+        height: 243
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 5, y: 5, z: 5, w: 6}
+      border: {x: 5, y: 3, z: 3, w: 3}
       customData: 
       outline: []
       physicsShape: []
@@ -135,10 +135,10 @@ TextureImporter:
       name: screen_1
       rect:
         serializedVersion: 2
-        x: 394
-        y: 393
-        width: 241
-        height: 239
+        x: 389
+        y: 387
+        width: 249
+        height: 247
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -157,13 +157,13 @@ TextureImporter:
       name: screen_2
       rect:
         serializedVersion: 2
-        x: 705
-        y: 382
-        width: 257
-        height: 257
+        x: 714
+        y: 392
+        width: 247
+        height: 245
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 2, z: 0, w: 5}
+      border: {x: 0, y: 2, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []

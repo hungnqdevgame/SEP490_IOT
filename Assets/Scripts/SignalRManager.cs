@@ -14,7 +14,7 @@ public class SignalRManager : MonoBehaviour
     public event Action<string> OnProductReceived;
     public event Action<float> OnProductRotatedEvent;
 
-    // [THÊM MỚI] Sự kiện dành riêng cho chữ Hello
+    
     public event Action<string> OnMessageReceivedEvent;
 
     void Awake()
@@ -67,6 +67,13 @@ public class SignalRManager : MonoBehaviour
             });
         });
 
+        connection.On<string>("OnGestureDetect", (gestureNumber) =>
+        {
+            MainThreadDispatcher.Enqueue(() =>
+            {
+                OnMessageReceivedEvent?.Invoke(gestureNumber);
+            });
+        });
         Connect();
     }
 
