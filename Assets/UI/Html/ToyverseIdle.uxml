@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Html/ToyverseStyles(7).uss?fileID=7433441132597879392&amp;guid=bbb003a237292e7429fa132d12c9ea85&amp;type=3#ToyverseStyles(7)" />
+    <ui:VisualElement name="idle-root" class="idle-root">
+        <ui:Label name="idle-section-label" text="TRẠNG THÁI CHỜ" class="section-label" />
+        <ui:VisualElement name="idle-card" class="idle-card">
+            <ui:VisualElement name="idle-ring-wrap" class="idle-ring-wrap">
+                <ui:VisualElement name="idle-ring-outer" class="idle-ring-outer" />
+                <ui:VisualElement name="idle-ring-inner" class="idle-ring-inner" />
+                <ui:Label name="idle-icon" text="🔍" class="idle-icon" />
+            </ui:VisualElement>
+            <ui:Label name="idle-title" text="ĐẶT SẢN PHẨM LÊN KỆ" class="idle-title" />
+            <ui:Label name="idle-sub" text="Hệ thống tự động nhận diện&#10;và hiển thị thông tin 3D" class="idle-sub" />
+            <ui:VisualElement name="idle-bar" class="idle-bar">
+                <ui:VisualElement name="idle-fill" class="idle-fill" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
