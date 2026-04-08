@@ -74,6 +74,8 @@ public class ToyverseDisplayController : MonoBehaviour
         {
             SignalRManager.Instance.OnMessageReceivedEvent += HandleMessageReceived;
             SignalRManager.Instance.OnProductReceived += HandleProductReceived;
+            SignalRManager.Instance.OnConnectionStatusChanged += UpdateConnectionUI;
+            UpdateConnectionUI(false);
         }
 
         var btnSettings = _productView?.Q<Button>("btn-settings");
@@ -112,6 +114,7 @@ public class ToyverseDisplayController : MonoBehaviour
         {
             SignalRManager.Instance.OnProductReceived -= HandleProductReceived;
             SignalRManager.Instance.OnMessageReceivedEvent -= HandleMessageReceived;
+            SignalRManager.Instance.OnConnectionStatusChanged -= UpdateConnectionUI;
         }
     }
 
@@ -153,18 +156,61 @@ public class ToyverseDisplayController : MonoBehaviour
     {
         if (playItem.fullProductData != null)
         {
-            // Chuyển đổi dữ liệu từ ProductItem sang ProductBarcodeData
-            string json = JsonUtility.ToJson(playItem.fullProductData);
-            ProductBarcodeData mappedData = JsonUtility.FromJson<ProductBarcodeData>(json);
+            // Bắt đầu tiến trình tải Full Data tự động
+            StartCoroutine(FetchFullDataRoutine(playItem));
+        }
+    }
 
-            if (mappedData != null)
+    private IEnumerator FetchFullDataRoutine(ModelPlaylistItem playItem)
+    {
+        // 1. Chuyển đổi dữ liệu tóm tắt sang định dạng BarcodeData để trích xuất ID / Barcode
+        string json = JsonUtility.ToJson(playItem.fullProductData);
+        ProductBarcodeData summaryData = JsonUtility.FromJson<ProductBarcodeData>(json);
+
+        // Cứu cánh: Đồng bộ giá tiền ngay lập tức (Do API tóm tắt dùng 'price', API chi tiết dùng 'basePrice')
+        summaryData.basePrice = playItem.fullProductData.price;
+
+        string fetchUrl = "";
+
+        // 2. Ưu tiên gọi API lấy Full Data bằng Barcode, nếu không có thì gọi bằng ID (Chuẩn RESTful)
+        if (!string.IsNullOrEmpty(summaryData.barcode))
+        {
+            fetchUrl = apiUrlGetBySku + summaryData.barcode;
+        }
+        else if (!string.IsNullOrEmpty(summaryData.id))
+        {
+            fetchUrl = "http://localhost:5035/api/Product/" + summaryData.id;
+        }
+
+        bool apiSuccess = false;
+
+        // 3. Tiến hành gọi API
+        if (!string.IsNullOrEmpty(fetchUrl))
+        {
+            using var request = UnityWebRequest.Get(fetchUrl);
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                // Bổ sung các field bị lệch tên giữa 2 class
-                mappedData.basePrice = playItem.fullProductData.price;
+                ProductBarcodeResponse response = null;
+                try { response = JsonUtility.FromJson<ProductBarcodeResponse>(request.downloadHandler.text); }
+                catch { }
 
-                // GỌI HIỂN THỊ VÀ TRUYỀN SKU MÀU ĐANG CHỌN
-                SetupUI(mappedData, playItem.sku);
+                // Nếu lấy thành công Full Data, lập tức đắp lên UI
+                if (response?.data != null && !string.IsNullOrEmpty(response.data.id))
+                {
+                    Debug.Log($"[ToyverseUI] Đã tải thành công Full Data cho: {response.data.name}");
+                    SetupUI(response.data, playItem.sku);
+                    apiSuccess = true;
+                }
             }
+        }
+
+        // 4. Kế hoạch B (Fallback): Nếu Backend chưa có API theo ID hoặc rớt mạng, dùng tạm bản tóm tắt
+        if (!apiSuccess)
+        {
+            Debug.LogWarning("[ToyverseUI] Gọi API Full Data thất bại. Hiển thị tạm dữ liệu tóm tắt.");
+            SetupUI(summaryData, playItem.sku);
         }
     }
 
@@ -481,7 +527,7 @@ public class ToyverseDisplayController : MonoBehaviour
         if (fill == null || ringOuter == null || ringInner == null) return;
 
         float progressMs = 0f;
-        const float progressDuration = 2500f;
+        const float progressDuration = 1000f;
 
         fill.style.width = Length.Percent(0);
         _progressAnim = fill.schedule.Execute(() =>
@@ -548,4 +594,30 @@ public class ToyverseDisplayController : MonoBehaviour
     }
 
     private static float EaseInOut(float t) => t * t * (3f - 2f * t);
+
+    // ================================================================
+    // CẬP NHẬT TRẠNG THÁI MẠNG LÊN UI
+    // ================================================================
+    private void UpdateConnectionUI(bool isConnected)
+    {
+        var liveDot = _productView?.Q<VisualElement>("live-dot");
+        var liveText = _productView?.Q<Label>("live-text");
+
+        if (liveDot == null || liveText == null) return;
+
+        if (isConnected)
+        {
+            liveText.text = "ĐÃ KẾT NỐI";
+            // Đổi chữ và chấm sang màu Xanh Neon (Màu Cyberpunk)
+            liveDot.style.backgroundColor = new StyleColor(new Color32(0, 255, 136, 255));
+            liveText.style.color = new StyleColor(new Color32(0, 255, 136, 255));
+        }
+        else
+        {
+            liveText.text = "CHƯA KẾT NỐI";
+            // Đổi chữ và chấm sang màu Đỏ Báo Động
+            liveDot.style.backgroundColor = new StyleColor(new Color32(255, 60, 60, 255));
+            liveText.style.color = new StyleColor(new Color32(255, 60, 60, 255));
+        }
+    }
 }

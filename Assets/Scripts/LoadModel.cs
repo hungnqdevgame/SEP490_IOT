@@ -61,6 +61,8 @@ public class LoadModel : MonoBehaviour
                 if (uwr.result != UnityWebRequest.Result.Success)
                 {
                     Debug.LogError("❌ LỖI MẠNG: " + uwr.error);
+                    Debug.Log(savePath);
+                    Debug.Log(bundleURL);
                     yield break; // Rớt mạng thì nghỉ
                 }
                 File.WriteAllBytes(savePath, uwr.downloadHandler.data);
