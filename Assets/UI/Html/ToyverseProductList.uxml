@@ -1,0 +1,71 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Html/ToyverseListStyles.uss?fileID=7433441132597879392&amp;guid=8ec3e31c8a11ac64abb3c9aebdbcefa7&amp;type=3#ToyverseListStyles" />
+    
+    <ui:VisualElement name="list-root" class="list-root">
+        <ui:VisualElement class="topbar">
+            <ui:Button name="btn-home" text="HOME" class="btn-home" />
+            <ui:TextField name="input-search" class="search-input" />
+            <ui:Button name="btn-confirm" text="XÁC NHẬN" class="btn-confirm" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="product-grid" class="product-grid">
+            <ui:VisualElement name="slot-0" class="product-card">
+                <ui:VisualElement name="card-img" class="card-image-box" />
+                <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
+                <ui:VisualElement class="card-actions">
+                    <ui:Toggle name="card-toggle" class="card-toggle" />
+                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="slot-1" class="product-card">
+                <ui:VisualElement name="card-img" class="card-image-box" />
+                <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
+                <ui:VisualElement class="card-actions">
+                    <ui:Toggle name="card-toggle" class="card-toggle" />
+                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="slot-2" class="product-card">
+                <ui:VisualElement name="card-img" class="card-image-box" />
+                <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
+                <ui:VisualElement class="card-actions">
+                    <ui:Toggle name="card-toggle" class="card-toggle" />
+                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="slot-3" class="product-card">
+                <ui:VisualElement name="card-img" class="card-image-box" />
+                <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
+                <ui:VisualElement class="card-actions">
+                    <ui:Toggle name="card-toggle" class="card-toggle" />
+                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="pagination-bar">
+            <ui:VisualElement class="pagination-box">
+                <ui:Button name="btn-prev" text="&lt;" class="btn-page" />
+                <ui:Label name="lbl-page" text="1" class="page-label" />
+                <ui:Button name="btn-next" text="&gt;" class="btn-page" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="review-modal" class="modal-overlay" style="display: none;">
+            <ui:VisualElement class="modal-box">
+                <ui:Label text="CÀI ĐẶT TRÌNH CHIẾU" class="modal-title" />
+                <ui:Label text="Thời gian hiển thị mỗi mô hình (giây):" class="modal-label" />
+                <ui:TextField name="input-time" text="60" class="modal-input" />
+                
+                <ui:VisualElement class="modal-actions">
+                    <ui:Button name="btn-cancel-show" text="HỦY BỎ" class="btn-cancel" />
+                    <ui:Button name="btn-start-show" text="BẮT ĐẦU PHÁT" class="btn-start" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>

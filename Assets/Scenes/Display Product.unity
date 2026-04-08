@@ -470,7 +470,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471902950}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4a5b58a414cabd34ca5a0209595b3ab6, type: 3}
   m_Name: 
@@ -522,7 +522,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471902950}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 46ec62a9c0b627140bb5f6ea0f31470d, type: 3}
   m_Name: 
@@ -540,7 +540,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 471902950}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea5446e84783e04468e730b00c0cde4e, type: 3}
   m_Name: 
@@ -589,7 +589,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiDocument: {fileID: 603589964}
-  idleTemplate: {fileID: 9197481963319205126, guid: 21a8575784140184aaeeccf72259407a, type: 3}
   productTemplate: {fileID: 9197481963319205126, guid: 21a8575784140184aaeeccf72259407a, type: 3}
   toyverseStyles: {fileID: 7433441132597879392, guid: bbb003a237292e7429fa132d12c9ea85, type: 3}
   modelLoader: {fileID: 471902955}
