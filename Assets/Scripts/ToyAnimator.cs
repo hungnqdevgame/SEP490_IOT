@@ -30,21 +30,25 @@ public class ToyAnimator : MonoBehaviour
     // =========================================================
     private void HandleRaspberrySignal(string signalValue)
     {
-        Debug.Log($"Raspberry gửi lệnh số: {signalValue}");
 
-        // Dùng switch-case để kiểm tra số và bật Animation tương ứng
-        switch (signalValue)
+        Debug.Log($"Raspberry gửi lệnh số: {signalValue}");
+        if (toyAnimator == null)
         {
-            case "1":
+            toyAnimator = FindAnyObjectByType<Animator>();
+        }
+            // Dùng switch-case để kiểm tra số và bật Animation tương ứng
+            switch (signalValue)
+        {
+            case "2":
                 SetAni1();
                 break;
-            case "2":
+            case "3":
                 SetAni2();
                 break;
-            case "3":
+            case "4":
                 SetAni3();
                 break;
-            case "4":
+            case "5":
                 SetAni4();
                 break;
             default:
@@ -111,4 +115,6 @@ public class ToyAnimator : MonoBehaviour
         toyAnimator.ResetTrigger("ani3");
         toyAnimator.ResetTrigger("ani4");
     }
+
+   
 }

@@ -16,12 +16,10 @@ public class CreateAssetBundles
             Directory.CreateDirectory(assetBundleDirectory);
         }
 
-        // Các lớp này chỉ tồn tại trong UnityEditor
+        // ĐÃ TỐI ƯU: Đổi từ None sang ChunkBasedCompression (LZ4)
         BuildPipeline.BuildAssetBundles(assetBundleDirectory,
-                                        BuildAssetBundleOptions.None,
+                                        BuildAssetBundleOptions.ChunkBasedCompression,
                                         BuildTarget.StandaloneWindows64);
-
-        Debug.Log("✅ Build AssetBundle thành công!");
     }
 }
 #endif

@@ -1,0 +1,250 @@
+/* ════════════════════════════════════════════
+   ROOT & LAYOUT
+════════════════════════════════════════════ */
+.list-root {
+    position: absolute; /* THÊM DÒNG NÀY ĐỂ CHỐNG LỆCH */
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: transparent; 
+    justify-content: space-between;
+}
+
+/* ════════════════════════════════════════════
+   TOP BAR
+════════════════════════════════════════════ */
+.topbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px 40px 0px 40px;
+    height: 120px;
+}
+
+/* GIAO DIỆN MỚI CỦA NÚT HOME */
+.btn-home {
+    background-color: rgba(0, 229, 255, 0.1);
+    border-color: rgb(0, 229, 255);
+    border-width: 2px;
+    border-radius: 10px;
+    color: rgb(0, 229, 255);
+    font-size: 28px;
+    -unity-font-style: bold;
+    padding: 15px 30px;
+}
+
+.search-input {
+    width: 50%;
+    height: 60px;
+}
+
+.search-input > .unity-text-field__input {
+    background-color: rgba(6, 10, 18, 0.9);
+    border-color: rgb(0, 229, 255);
+    border-width: 3px;
+    border-radius: 8px;
+    color: white;
+    font-size: 28px;
+    padding-left: 20px;
+}
+
+.btn-confirm {
+    background-color: rgb(15, 45, 120);
+    border-color: rgb(0, 229, 255);
+    border-width: 2px;
+    color: white;
+    font-size: 30px;
+    -unity-font-style: bold;
+    padding: 15px 30px;
+    border-radius: 10px;
+}
+
+/* ════════════════════════════════════════════
+   PRODUCT GRID & CARDS
+════════════════════════════════════════════ */
+.product-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.product-card {
+    width: 340px;
+    height: 480px;
+    background-color: rgba(10, 14, 26, 0.85);
+    border-color: rgb(0, 229, 255);
+    border-width: 4px;
+    border-radius: 25px;
+    margin: 20px;
+    padding: 25px;
+    flex-direction: column;
+}
+
+.card-image-box {
+    width: 100%;
+    height: 240px;
+    background-color: rgb(120, 120, 120);
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+
+.card-title {
+   font-size: 32px;
+    color: white;
+    -unity-font-style: bold;
+    
+    /* CẤU HÌNH CHO 2 DÒNG */
+    white-space: normal;      /* Cho phép rớt dòng */
+    overflow: hidden;         /* Giấu chữ thừa */
+    text-overflow: ellipsis;  /* Thêm dấu "..." (chỉ hoạt động tốt trên Unity 2022+) */
+    
+    /* Khóa cứng chiều cao (Font 32px x 2 dòng + khoảng cách ~ 80px) */
+    height: 80px; 
+    max-height: 80px;
+    
+    flex-grow: 0;
+    flex-shrink: 0;
+    margin-bottom: 10px;
+}
+
+/* KHỐI CHỨA CHECKBOX & NÚT SHOW */
+.card-actions {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    
+    /* VŨ KHÍ BÍ MẬT: Tuyệt đối không cho phép khối này bị ép lùn xuống */
+    flex-shrink: 0; 
+    margin-top: 10px;
+}
+
+/* ════════════════════════════════════════════
+   CHUẨN HÓA CHECKBOX (CHỐNG TÀNG HÌNH)
+════════════════════════════════════════════ */
+.card-toggle {
+    width: 50px;
+    height: 50px;
+    margin: 0;
+    padding: 0;
+}
+
+/* Xóa sổ cái nhãn (label) ẩn mặc định của Unity gây tốn diện tích */
+.card-toggle > .unity-label {
+    display: none;
+}
+
+.card-toggle .unity-toggle__input {
+    flex-grow: 1;
+}
+
+/* Ép cứng kích thước và màu sắc cho ô vuông dấu tích */
+/* (Lưu ý: Dùng khoảng trắng thay vì dấu '>' để trị mọi phiên bản Unity) */
+.card-toggle .unity-toggle__checkmark {
+    width: 50px !important;
+    height: 50px !important;
+    background-color: rgba(6, 10, 18, 0.9);
+    border-color: rgb(0, 229, 255);
+    border-width: 3px;
+    border-radius: 8px;
+    -unity-background-image-tint-color: white;
+}
+
+/* Khi được tích chọn -> Đổi nền Cyan, Dấu tích đen */
+.card-toggle:checked .unity-toggle__checkmark {
+    background-color: rgb(0, 229, 255);
+    -unity-background-image-tint-color: black;
+}
+
+/* ════════════════════════════════════════════
+   NÚT SHOW
+════════════════════════════════════════════ */
+.btn-show {
+    background-color: rgb(0, 120, 255);
+    color: white;
+    font-size: 28px;
+    -unity-font-style: bold;
+    border-width: 0;
+    border-radius: 10px;
+    height: 50px;
+    padding: 0 30px;
+}
+
+/* ════════════════════════════════════════════
+   PAGINATION (Phân trang)
+════════════════════════════════════════════ */
+.pagination-bar {
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 80px; 
+}
+
+.pagination-box {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(10, 14, 26, 0.8);
+    border-color: rgb(0, 229, 255);
+    border-width: 3px;
+    border-radius: 15px;
+    padding: 10px 20px;
+}
+
+.btn-page {
+    background-color: transparent;
+    border-width: 0;
+    color: white;
+    font-size: 50px;
+    -unity-font-style: bold;
+    margin: 0 10px;
+}
+
+.page-label {
+    font-size: 45px;
+    color: white;
+    -unity-font-style: bold;
+    margin: 0 40px;
+}
+
+    .modal-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(6, 10, 18, 0.95);
+    align-items: center; justify-content: center;
+}
+
+.modal-box {
+    width: 80%; max-width: 600px;
+    background-color: rgb(10, 14, 26);
+    border-color: rgb(0, 229, 255); border-width: 3px; border-radius: 20px;
+    padding: 40px; flex-direction: column;
+}
+
+.modal-title { 
+    font-size: 35px; color: rgb(0, 229, 255); 
+    -unity-text-align: middle-center; margin-bottom: 20px; -unity-font-style: bold; 
+}
+
+.modal-label { 
+    font-size: 24px; color: white; margin-bottom: 10px; 
+}
+
+.modal-input > .unity-text-field__input {
+    background-color: rgba(0, 229, 255, 0.1); 
+    border-color: rgb(0, 229, 255); border-width: 2px; border-radius: 10px;
+    color: white; font-size: 30px; padding: 10px 20px;
+}
+
+.modal-input { margin-bottom: 40px; }
+
+.modal-actions { flex-direction: row; justify-content: space-between; }
+
+.btn-cancel { 
+    flex: 1; background-color: rgb(60, 60, 60); color: white; font-size: 24px; 
+    border-radius: 10px; padding: 15px; margin-right: 10px; border-width: 0; -unity-font-style: bold; 
+}
+
+.btn-start { 
+    flex: 1; background-color: rgb(0, 120, 255); color: white; font-size: 24px; 
+    border-radius: 10px; padding: 15px; margin-left: 10px; border-width: 0; -unity-font-style: bold; 
+}

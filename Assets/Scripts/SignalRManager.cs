@@ -12,17 +12,16 @@ public class SignalRManager : MonoBehaviour
     private HubConnection connection;
 
     public event Action<string> OnProductReceived;
-    public event Action<float> OnProductRotatedEvent;
-
-    
+    public event Action<float> OnProductRotatedEvent;  
     public event Action<string> OnMessageReceivedEvent;
-
+    public event Action<bool> OnConnectionStatusChanged;
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            serverUrl = PlayerPrefs.GetString("SignalR_URL", "http://localhost:5035/productHub");
             SetupSignalR();
         }
         else
@@ -44,6 +43,7 @@ public class SignalRManager : MonoBehaviour
 
         connection.On<string>("OnProductSelected", (barCode) =>
         {
+            Debug.Log(barCode);
             MainThreadDispatcher.Enqueue(() =>
             {
                 OnProductReceived?.Invoke(barCode);
@@ -74,6 +74,21 @@ public class SignalRManager : MonoBehaviour
                 OnMessageReceivedEvent?.Invoke(gestureNumber);
             });
         });
+        connection.Closed += async (error) =>
+        {
+            MainThreadDispatcher.Enqueue(() => OnConnectionStatusChanged?.Invoke(false));
+            await Task.CompletedTask;
+        };
+        connection.Reconnecting += async (error) =>
+        {
+            MainThreadDispatcher.Enqueue(() => OnConnectionStatusChanged?.Invoke(false));
+            await Task.CompletedTask;
+        };
+        connection.Reconnected += async (connectionId) =>
+        {
+            MainThreadDispatcher.Enqueue(() => OnConnectionStatusChanged?.Invoke(true));
+            await Task.CompletedTask;
+        };
         Connect();
     }
 
@@ -83,10 +98,14 @@ public class SignalRManager : MonoBehaviour
         {
             await connection.StartAsync();
             Debug.Log("Kết nối Server thành công!");
+            // BÁO CÁO: ĐÃ KẾT NỐI
+            MainThreadDispatcher.Enqueue(() => OnConnectionStatusChanged?.Invoke(true));
         }
         catch (Exception ex)
         {
             Debug.LogError($"Kết nối thất bại: {ex.Message}");
+            // BÁO CÁO: LỖI MẠNG
+            MainThreadDispatcher.Enqueue(() => OnConnectionStatusChanged?.Invoke(false));
         }
     }
 
@@ -114,5 +133,16 @@ public class SignalRManager : MonoBehaviour
             }
             catch (Exception ex) { Debug.LogWarning($"Lỗi khi đóng kết nối: {ex.Message}"); }
         }
+    }
+
+    public async void ReconnectWithNewUrl(string newUrl)
+    {
+        serverUrl = newUrl;
+        PlayerPrefs.SetString("SignalR_URL", newUrl); // Lưu vào máy
+        PlayerPrefs.Save();
+
+        Debug.Log("[SignalR] Đang thử kết nối lại với: " + newUrl);
+        await CloseConnection(); // Ngắt kết nối cũ
+        SetupSignalR();          // Thiết lập lại với URL mới
     }
 }

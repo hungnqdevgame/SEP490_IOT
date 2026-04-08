@@ -142,6 +142,10 @@ public class ProductBarcodeData
     public string ageRange;
     public bool isActive;
     public string createdAt;
+    public float width;
+    public float length;
+    public float height;
+    public float weight;
 
     // Mảng chứa các biến thể màu sắc
     public List<ProductBarcodeColor> colors;
@@ -160,4 +164,5 @@ public class ProductBarcodeColor
     public string model3DUrl;     // Có thể bị null, không sao cả
     public string imageUrl;
     public bool isActive;
+
 }

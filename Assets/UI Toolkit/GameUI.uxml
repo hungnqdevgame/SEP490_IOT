@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/USS/NewUSSFile.uss?fileID=7433441132597879392&amp;guid=9dbcc3a8368ce3843a7324f9aa060810&amp;type=3#NewUSSFile" />
+    
+    <ui:VisualElement name="screen-container" class="body">
+        
+        <ui:VisualElement name="idle-section" class="idle-container" style="display: none;">
+            <ui:Label text="TRẠNG THÁI CHỜ" class="sp-header" />
+            <ui:VisualElement class="idle-card">
+                <ui:VisualElement class="idle-ring">
+                    <ui:Label text="🔍" class="idle-icon" />
+                </ui:VisualElement>
+                <ui:Label text="ĐẶT SẢN PHẨM LÊN KỆ" class="idle-title" />
+                <ui:Label text="Hệ thống tự động nhận diện và hiển thị thông tin 3D" class="idle-sub" />
+                <ui:VisualElement class="idle-bar">
+                    <ui:VisualElement class="idle-fill" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label text="MÀN HÌNH TƯƠNG TÁC" class="sp-header" style="margin-top: 20px; margin-bottom: 10px; color: #00E5FF; font-size: 10px; letter-spacing: 2px;" />
+        
+        <ui:VisualElement name="main-frame" class="frame">
+            <ui:VisualElement class="corner tl" />
+            <ui:VisualElement class="corner tr" />
+            <ui:VisualElement class="corner bl" />
+            <ui:VisualElement class="corner br" />
+            
+            <ui:VisualElement class="topbar">
+                <ui:Label text="TOYVERSE" class="logo" />
+                <ui:VisualElement class="live-badge">
+                    <ui:VisualElement class="dot" />
+                    <ui:Label text="ĐANG HIỂN THỊ" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="viewer">
+                <ui:VisualElement class="viewer-grid" />
+                <ui:VisualElement class="viewer-glow" />
+                <ui:VisualElement class="product-3d">
+                    <ui:Label text="🤖" class="product-emoji" style="font-size: 80px;" />
+                    <ui:VisualElement class="product-shadow" />
+                </ui:VisualElement>
+                <ui:VisualElement class="view-angles">
+                    <ui:Button text="F" class="angle-btn active" />
+                    <ui:Button text="L" class="angle-btn" />
+                    <ui:Button text="R" class="angle-btn" />
+                    <ui:Button text="B" class="angle-btn" />
+                    <ui:Button text="↑" class="angle-btn" />
+                </ui:VisualElement>
+                <ui:VisualElement class="rotate-hint" style="position: absolute; bottom: 10px; flex-direction: row; align-items: center;">
+                    <ui:VisualElement class="rotate-arrows" style="flex-direction: row; margin-right: 5px;">
+                        <ui:Label text="◀" class="ra" style="color: #7A9ABB; font-size: 10px; border-width: 1px; border-color: #7A9ABB; padding: 2px 4px; border-radius: 4px; margin-right: 2px;" />
+                        <ui:Label text="▶" class="ra" style="color: #7A9ABB; font-size: 10px; border-width: 1px; border-color: #7A9ABB; padding: 2px 4px; border-radius: 4px;" />
+                    </ui:VisualElement>
+                    <ui:Label text="XOAY 360°" style="color: #7A9ABB; font-size: 10px;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="info-row">
+                <ui:VisualElement>
+                    <ui:Label text="TITAN X9" class="prod-name" />
+                    <ui:Label text="Robot Điều Khiển · Series 2025" class="prod-sub" />
+                </ui:VisualElement>
+                <ui:Label text="CT-000001-BL" class="prod-id" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="tabs">
+                <ui:Button text="TỔNG QUAN" class="tab active" />
+                <ui:Button text="THÔNG SỐ" class="tab" />
+                <ui:Button text="GALLERY" class="tab" />
+            </ui:VisualElement>
+
+            <ui:VisualElement class="color-section">
+                <ui:Label text="CHỌN MÀU ĐỂ XEM 3D" class="sec-label" />
+                <ui:VisualElement class="swatches">
+                    <ui:VisualElement class="sw on" style="background-color: rgb(26, 74, 255);">
+                        <ui:Label text="✓" class="sw-check" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="sw" style="background-color: rgb(204, 34, 34);" />
+                    <ui:VisualElement class="sw" style="background-color: rgb(30, 30, 30); border-color: #444; border-width: 1px;" />
+                    <ui:VisualElement class="sw" style="background-color: rgb(200, 191, 160);" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="features">
+                <ui:VisualElement class="feat">
+                    <ui:Label text="🔊" class="feat-icon" />
+                    <ui:Label text="Âm thanh &amp; LED" class="feat-text" />
+                    <ui:Label text="CÓ" class="feat-badge fb-cyan" />
+                </ui:VisualElement>
+                <ui:VisualElement class="feat">
+                    <ui:Label text="📡" class="feat-icon" />
+                    <ui:Label text="Điều khiển 2.4GHz" class="feat-text" />
+                    <ui:Label text="30M" class="feat-badge fb-gold" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement class="specs">
+                <ui:VisualElement class="spec">
+                    <ui:Label text="CHẤT LIỆU" class="spec-l" />
+                    <ui:Label text="ABS cao cấp" class="spec-v" />
+                </ui:VisualElement>
+                <ui:VisualElement class="spec">
+                    <ui:Label text="NGUỒN" class="spec-l" />
+                    <ui:Label text="4× AA" class="spec-v" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

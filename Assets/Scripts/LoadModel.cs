@@ -103,4 +103,35 @@ public class LoadModel : MonoBehaviour
         // Dọn rác
         bundle.Unload(false);
     }
+
+    private IEnumerator DownloadModelFromDb(string sku)
+    {
+        // Đường dẫn trỏ thẳng vào API Download của bạn
+        string apiUrl = $"http://localhost:5035/api/Bundle/download-bundle/{sku}";
+
+        using (UnityWebRequest www = UnityWebRequestAssetBundle.GetAssetBundle(apiUrl))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Lỗi tải từ DB: " + www.error);
+            }
+            else
+            {
+                // Lấy Bundle ra từ kết quả tải về
+                AssetBundle bundle = DownloadHandlerAssetBundle.GetContent(www);
+
+                if (bundle != null)
+                {
+                    // Load mô hình 3D từ trong Bundle (tên phải khớp lúc bạn đặt khi Build)
+                    GameObject prefab = bundle.LoadAsset<GameObject>(sku);
+                    Instantiate(prefab);
+
+                    // Giải phóng bundle để tránh tràn RAM
+                    bundle.Unload(false);
+                }
+            }
+        }
+    }
 }

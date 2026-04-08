@@ -144,7 +144,8 @@ public class SelectionManager : MonoBehaviour
     {
         if (selectedList.Count == 0) return;
 
-        // Tắt màn chính, bật màn Review
+        // Tắt màn chính, bật màn Re
+        // 
         mainListPanel.SetActive(false);
         reviewPanel.SetActive(true);
 
