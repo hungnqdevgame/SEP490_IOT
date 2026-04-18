@@ -1,0 +1,30 @@
+<linker>
+  <assembly fullname="System.Core">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="System">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Client">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Client.Core">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Microsoft.AspNetCore.SignalR.Common">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Microsoft.AspNetCore.Http.Connections.Client">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Microsoft.AspNetCore.Http.Connections.Common">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="System.Text.Json">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+  <assembly fullname="Newtonsoft.Json">
+    <type fullname="*" preserve="all"/>
+  </assembly>
+</linker>

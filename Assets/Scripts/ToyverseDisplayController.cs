@@ -68,12 +68,14 @@ public class ToyverseDisplayController : MonoBehaviour
         }
 
         // ================================================================
-        // ĐĂNG KÝ SỰ KIỆN SIGNALR VÀ NÚT BẤM (GIỮ NGUYÊN)
+        // ĐĂNG KÝ SỰ KIỆN WEBSOCKET VÀ NÚT BẤM (ĐÃ ĐỔI SANG WEBSOCKET)
         // ================================================================
-        if (SignalRManager.Instance != null)
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnMessageReceivedEvent += HandleMessageReceived;
-            SignalRManager.Instance.OnProductReceived += HandleProductReceived;
+            WebSocketManager.Instance.OnMessageReceivedEvent += HandleMessageReceived;
+            WebSocketManager.Instance.OnProductReceived += HandleProductReceived;
+            WebSocketManager.Instance.OnConnectionStatusChanged += UpdateConnectionUI;
+            UpdateConnectionUI(false);
         }
 
         var btnSettings = _productView?.Q<Button>("btn-settings");
@@ -93,25 +95,33 @@ public class ToyverseDisplayController : MonoBehaviour
             if (settingsPanel != null)
             {
                 settingsPanel.style.display = DisplayStyle.Flex;
-                if (inputUrl != null) inputUrl.value = PlayerPrefs.GetString("SignalR_URL", "http://localhost:5035/productHub");
+                // Đổi đường dẫn mặc định thành chuẩn WebSocket
+                if (inputUrl != null) inputUrl.value = PlayerPrefs.GetString("WebSocket_URL", "ws://192.168.137.194:8765/ws");
             }
         });
+
         btnCloseSettings?.RegisterCallback<ClickEvent>(e => {
             if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.None;
         });
+
         btnSaveSettings?.RegisterCallback<ClickEvent>(e => {
             if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.None;
-            if (inputUrl != null && SignalRManager.Instance != null) SignalRManager.Instance.ReconnectWithNewUrl(inputUrl.value);
+            if (inputUrl != null && WebSocketManager.Instance != null)
+            {
+                WebSocketManager.Instance.ReconnectWithNewUrl(inputUrl.value);
+            }
         });
     }
 
     private void OnDestroy()
     {
         StopAllAnimations();
-        if (SignalRManager.Instance != null)
+        // HỦY ĐĂNG KÝ WEBSOCKET KHI THOÁT
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnProductReceived -= HandleProductReceived;
-            SignalRManager.Instance.OnMessageReceivedEvent -= HandleMessageReceived;
+            WebSocketManager.Instance.OnProductReceived -= HandleProductReceived;
+            WebSocketManager.Instance.OnMessageReceivedEvent -= HandleMessageReceived;
+            WebSocketManager.Instance.OnConnectionStatusChanged -= UpdateConnectionUI;
         }
     }
 
@@ -153,23 +163,57 @@ public class ToyverseDisplayController : MonoBehaviour
     {
         if (playItem.fullProductData != null)
         {
-            // Chuyển đổi dữ liệu từ ProductItem sang ProductBarcodeData
-            string json = JsonUtility.ToJson(playItem.fullProductData);
-            ProductBarcodeData mappedData = JsonUtility.FromJson<ProductBarcodeData>(json);
+            StartCoroutine(FetchFullDataRoutine(playItem));
+        }
+    }
 
-            if (mappedData != null)
+    private IEnumerator FetchFullDataRoutine(ModelPlaylistItem playItem)
+    {
+        string json = JsonUtility.ToJson(playItem.fullProductData);
+        ProductBarcodeData summaryData = JsonUtility.FromJson<ProductBarcodeData>(json);
+        summaryData.basePrice = playItem.fullProductData.price;
+
+        string fetchUrl = "";
+        if (!string.IsNullOrEmpty(summaryData.barcode))
+        {
+            fetchUrl = apiUrlGetBySku + summaryData.barcode;
+        }
+        else if (!string.IsNullOrEmpty(summaryData.id))
+        {
+            fetchUrl = "http://localhost:5035/api/Product/" + summaryData.id;
+        }
+
+        bool apiSuccess = false;
+
+        if (!string.IsNullOrEmpty(fetchUrl))
+        {
+            using var request = UnityWebRequest.Get(fetchUrl);
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
             {
-                // Bổ sung các field bị lệch tên giữa 2 class
-                mappedData.basePrice = playItem.fullProductData.price;
+                ProductBarcodeResponse response = null;
+                try { response = JsonUtility.FromJson<ProductBarcodeResponse>(request.downloadHandler.text); }
+                catch { }
 
-                // GỌI HIỂN THỊ VÀ TRUYỀN SKU MÀU ĐANG CHỌN
-                SetupUI(mappedData, playItem.sku);
+                if (response?.data != null && !string.IsNullOrEmpty(response.data.id))
+                {
+                    Debug.Log($"[ToyverseUI] Đã tải thành công Full Data cho: {response.data.name}");
+                    SetupUI(response.data, playItem.sku);
+                    apiSuccess = true;
+                }
             }
+        }
+
+        if (!apiSuccess)
+        {
+            Debug.LogWarning("[ToyverseUI] Gọi API Full Data thất bại. Hiển thị tạm dữ liệu tóm tắt.");
+            SetupUI(summaryData, playItem.sku);
         }
     }
 
     // ================================================================
-    // SIGNALR & GỌI API BARCODE (CHO SÚNG QUÉT)
+    // NHẬN TÍN HIỆU TỪ WEBSOCKET
     // ================================================================
     private void HandleMessageReceived(string text)
     {
@@ -200,7 +244,6 @@ public class ToyverseDisplayController : MonoBehaviour
 
     private void HandleProductReceived(string barCode)
     {
-        // Khi dùng súng quét mã vạch, ta phải dừng Slideshow lại
         if (_slideshowCoroutine != null) StopCoroutine(_slideshowCoroutine);
 
         barCode = barCode.Trim();
@@ -230,7 +273,7 @@ public class ToyverseDisplayController : MonoBehaviour
     }
 
     // ================================================================
-    // CẬP NHẬT UI (CÓ THÊM TARGET SKU ĐỂ LOAD ĐÚNG MÀU KHI SLIDESHOW)
+    // CẬP NHẬT UI
     // ================================================================
     private void SetupUI(ProductBarcodeData data, string targetSku = "")
     {
@@ -244,7 +287,6 @@ public class ToyverseDisplayController : MonoBehaviour
         }
         else SetLabel("spec-type", "Chưa phân loại");
 
-        // Gửi mã SKU mục tiêu (Nếu có) để tự động bấm chọn đúng ô màu đó
         BuildColorSwatches(data, targetSku);
     }
 
@@ -304,7 +346,6 @@ public class ToyverseDisplayController : MonoBehaviour
                 _swatches.Add(swatchEntry);
             }
 
-            // Tự động tìm và chọn ô màu theo mã targetSku (nếu có), nếu không thì chọn ô đầu tiên
             int selectedIndex = 0;
             if (!string.IsNullOrEmpty(targetSku))
             {
@@ -481,7 +522,7 @@ public class ToyverseDisplayController : MonoBehaviour
         if (fill == null || ringOuter == null || ringInner == null) return;
 
         float progressMs = 0f;
-        const float progressDuration = 2500f;
+        const float progressDuration = 1000f;
 
         fill.style.width = Length.Percent(0);
         _progressAnim = fill.schedule.Execute(() =>
@@ -548,4 +589,28 @@ public class ToyverseDisplayController : MonoBehaviour
     }
 
     private static float EaseInOut(float t) => t * t * (3f - 2f * t);
+
+    // ================================================================
+    // CẬP NHẬT TRẠNG THÁI MẠNG LÊN UI
+    // ================================================================
+    private void UpdateConnectionUI(bool isConnected)
+    {
+        var liveDot = _productView?.Q<VisualElement>("live-dot");
+        var liveText = _productView?.Q<Label>("live-text");
+
+        if (liveDot == null || liveText == null) return;
+
+        if (isConnected)
+        {
+            liveText.text = "ĐÃ KẾT NỐI";
+            liveDot.style.backgroundColor = new StyleColor(new Color32(0, 255, 136, 255));
+            liveText.style.color = new StyleColor(new Color32(0, 255, 136, 255));
+        }
+        else
+        {
+            liveText.text = "CHƯA KẾT NỐI";
+            liveDot.style.backgroundColor = new StyleColor(new Color32(255, 60, 60, 255));
+            liveText.style.color = new StyleColor(new Color32(255, 60, 60, 255));
+        }
+    }
 }

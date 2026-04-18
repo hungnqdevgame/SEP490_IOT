@@ -8,20 +8,20 @@ public class ToyAnimator : MonoBehaviour
     {
         toyAnimator = GetComponent<Animator>();
 
-        // 1. ĐĂNG KÝ LẮNG NGHE SIGNALR
-        // Khi SignalR nhận được tin nhắn, nó sẽ tự động gọi hàm HandleRaspberrySignal
-        if (SignalRManager.Instance != null)
+        // 1. ĐĂNG KÝ LẮNG NGHE WEBSOCKET
+        // Khi WebSocket nhận được tin nhắn, nó sẽ tự động gọi hàm HandleRaspberrySignal
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnMessageReceivedEvent += HandleRaspberrySignal;
+            WebSocketManager.Instance.OnMessageReceivedEvent += HandleRaspberrySignal;
         }
     }
 
     void OnDestroy()
     {
         // 2. HỦY ĐĂNG KÝ KHI OBJECT BỊ XÓA (Chống lỗi tràn RAM)
-        if (SignalRManager.Instance != null)
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnMessageReceivedEvent -= HandleRaspberrySignal;
+            WebSocketManager.Instance.OnMessageReceivedEvent -= HandleRaspberrySignal;
         }
     }
 
@@ -30,14 +30,15 @@ public class ToyAnimator : MonoBehaviour
     // =========================================================
     private void HandleRaspberrySignal(string signalValue)
     {
+        Debug.Log($"[ToyAnimator] Raspberry gửi lệnh số: {signalValue}");
 
-        Debug.Log($"Raspberry gửi lệnh số: {signalValue}");
         if (toyAnimator == null)
         {
             toyAnimator = FindAnyObjectByType<Animator>();
         }
-            // Dùng switch-case để kiểm tra số và bật Animation tương ứng
-            switch (signalValue)
+
+        // Dùng switch-case để kiểm tra số và bật Animation tương ứng
+        switch (signalValue)
         {
             case "2":
                 SetAni1();
@@ -52,7 +53,7 @@ public class ToyAnimator : MonoBehaviour
                 SetAni4();
                 break;
             default:
-                // Bỏ qua nếu tin nhắn không phải là số 1, 2, 3, 4 (ví dụ: tin nhắn HelloGuest)
+                // Bỏ qua nếu tin nhắn không phải là số 1, 2, 3, 4
                 break;
         }
     }
@@ -62,26 +63,7 @@ public class ToyAnimator : MonoBehaviour
         Debug.Log("Cộp cộp (Bước chân)");
     }
 
-    // =========================================================
-    // LỜI KHUYÊN: TỐI ƯU HIỆU SUẤT (RẤT QUAN TRỌNG)
-    // =========================================================
-    void Update()
-    {
-        // TÔI ĐÃ TẮT HÀM CheckAnimatior() TRONG UPDATE ĐI!
-        // Lý do: Lệnh FindAnyObjectByType rất nặng. Nếu không tìm thấy Animator, 
-        // nó sẽ quét toàn bộ game 60 lần/giây, làm game của bạn cực kỳ giật lag (tụt FPS).
-        // CheckAnimatior(); 
-    }
-
-    private void CheckAnimatior()
-    {
-        if (toyAnimator == null)
-        {
-            toyAnimator = FindAnyObjectByType<Animator>();
-        }
-    }
-
-    // --- CÁC HÀM ANIMATION GIỮ NGUYÊN CỦA BẠN ---
+    // --- CÁC HÀM ANIMATION GIỮ NGUYÊN ---
     public void SetAni1()
     {
         ResetAllTriggers();
@@ -115,6 +97,4 @@ public class ToyAnimator : MonoBehaviour
         toyAnimator.ResetTrigger("ani3");
         toyAnimator.ResetTrigger("ani4");
     }
-
-   
 }
