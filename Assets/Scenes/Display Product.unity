@@ -128,8 +128,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 916104217465208250, guid: 58a105989043090459b788e665df2367, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 916104217465208250, guid: 58a105989043090459b788e665df2367, type: 3}
       propertyPath: serverUrl
-      value: http://localhost:5035/productHub
+      value: ws://pi4:8765/hubs/product
+      objectReference: {fileID: 0}
+    - target: {fileID: 5289795220231706497, guid: 58a105989043090459b788e665df2367, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5911793594285677181, guid: 58a105989043090459b788e665df2367, type: 3}
       propertyPath: m_LocalPosition.x
@@ -175,10 +183,17 @@ PrefabInstance:
       propertyPath: m_Name
       value: NetworkManager
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 916104217465208250, guid: 58a105989043090459b788e665df2367, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8838400851340966456, guid: 58a105989043090459b788e665df2367, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 591076962}
+    - targetCorrespondingSourceObject: {fileID: 8838400851340966456, guid: 58a105989043090459b788e665df2367, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 591076965}
   m_SourcePrefab: {fileID: 100100000, guid: 58a105989043090459b788e665df2367, type: 3}
 --- !u!1 &290070837
 GameObject:
@@ -560,6 +575,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toyAnimator: {fileID: 0}
+--- !u!1 &591076961 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8838400851340966456, guid: 58a105989043090459b788e665df2367, type: 3}
+  m_PrefabInstance: {fileID: 172619478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &591076962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591076961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0e2545c0f25fd06458eb6ec7fa6dfbc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &591076965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591076961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 078fa055a94854142ad4eeef926f319c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverUrl: ws://localhost:5035/ws
 --- !u!1 &603589963 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2384574420002479693, guid: f1c1b4c6091bd6f428dbf3057ee33cd7, type: 3}
@@ -592,9 +637,9 @@ MonoBehaviour:
   productTemplate: {fileID: 9197481963319205126, guid: 21a8575784140184aaeeccf72259407a, type: 3}
   toyverseStyles: {fileID: 7433441132597879392, guid: bbb003a237292e7429fa132d12c9ea85, type: 3}
   modelLoader: {fileID: 471902955}
-  apiUrlGetBySku: http://localhost:5035/api/Product/barcode/
-  apiUrlCategory: http://localhost:5035/api/ProductCategory/
-  bundleServerUrl: http://localhost:5035/
+  apiUrlGetBySku: https://toyshelf.io.vn/api/Product/barcode/
+  apiUrlCategory: https://toyshelf.io.vn/api/ProductCategory/
+  bundleServerUrl: https://toyshelf.io.vn/
 --- !u!1001 &626520057
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -609,7 +654,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8603166960496175128, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
       propertyPath: m_LocalPosition.x
