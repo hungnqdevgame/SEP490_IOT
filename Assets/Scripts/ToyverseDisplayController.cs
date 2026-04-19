@@ -83,12 +83,13 @@ public class ToyverseDisplayController : MonoBehaviour
         var btnCloseSettings = _productView?.Q<Button>("btn-close-settings");
         var btnSaveSettings = _productView?.Q<Button>("btn-save-settings");
         var inputUrl = _productView?.Q<TextField>("input-server-url");
+        var btnHome = _productView?.Q<Button>("btn-home");
 
         // Mẹo: Cho phép bấm vào Logo TOYVERSE để thoát về màn hình danh sách
         var logoLabel = _productView?.Q<Label>("logo");
         logoLabel?.RegisterCallback<ClickEvent>(e => {
             DataBridge.isSlideshowMode = false;
-            SceneManager.LoadScene("Product Scene"); // Đổi về tên Scene danh sách của bạn
+            SceneManager.LoadScene("Display Product"); // Đổi về tên Scene danh sách của bạn
         });
 
         btnSettings?.RegisterCallback<ClickEvent>(e => {
@@ -98,6 +99,16 @@ public class ToyverseDisplayController : MonoBehaviour
                 // Đổi đường dẫn mặc định thành chuẩn WebSocket
                 if (inputUrl != null) inputUrl.value = PlayerPrefs.GetString("WebSocket_URL", "ws://192.168.137.194:8765/ws");
             }
+        });
+        btnHome?.RegisterCallback<ClickEvent>(e => {
+            // Tắt chế độ slideshow (nếu đang bật)
+            DataBridge.isSlideshowMode = false;
+
+            // Xóa danh sách nhạc chờ (nếu cần)
+            if (DataBridge.playlist != null) DataBridge.playlist.Clear();
+
+            // Chuyển cảnh về Product Scene
+            SceneManager.LoadScene("Product Scene");
         });
 
         btnCloseSettings?.RegisterCallback<ClickEvent>(e => {

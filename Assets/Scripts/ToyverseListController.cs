@@ -88,7 +88,7 @@ public class ToyverseListController : MonoBehaviour
 
         // ĐÃ SỬA NÚT HOME CHUYỂN VỀ PRODUCT SCENE
         _btnHome.clicked += () => {
-            SceneManager.LoadScene("ProductScene");
+            SceneManager.LoadScene("Display Product");
         };
 
         _searchField?.RegisterCallback<ChangeEvent<string>>(evt => {
