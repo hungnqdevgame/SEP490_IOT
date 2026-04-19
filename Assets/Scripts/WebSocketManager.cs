@@ -13,6 +13,11 @@ public class WebSocketManager : MonoBehaviour
     public string serverUrl;
     private WebSocket websocket;
 
+    // CẤU HÌNH AUTO-RECONNECT
+    private bool isReconnecting = false;
+    private const int ReconnectDelayMs = 3000;
+    private bool isQuitting = false;
+
     // Các Event giao tiếp với ToyAnimator và UI
     public event Action<string> OnProductReceived;
     public event Action<float> OnProductRotatedEvent;
@@ -26,10 +31,10 @@ public class WebSocketManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            string savedUrl = PlayerPrefs.GetString("WebSocket_URL", "ws://192.168.137.194:8765/ws");
+            string savedUrl = PlayerPrefs.GetString("WebSocket_URL", "ws://192.168.137.194:5035/ws");
             serverUrl = savedUrl.Replace("http://", "ws://").Replace("https://", "wss://");
 
-            InitWebSocket();
+            ConnectToServer();
         }
         else
         {
@@ -44,14 +49,29 @@ public class WebSocketManager : MonoBehaviour
 #endif
     }
 
-    async void InitWebSocket()
+    async void ConnectToServer()
     {
+        if (isQuitting) return;
+
         Debug.Log($"[WebSocket] Đang kết nối tới: {serverUrl}");
+
+        // 1. DỌN DẸP KẾT NỐI CŨ (Đã xóa các dòng gán null gây lỗi)
+        if (websocket != null)
+        {
+            if (websocket.State == WebSocketState.Open)
+            {
+                await websocket.Close();
+            }
+            websocket = null;
+        }
+
+        // 2. KHỞI TẠO KẾT NỐI MỚI
         websocket = new WebSocket(serverUrl);
 
         websocket.OnOpen += () =>
         {
             Debug.Log("[WebSocket] Kết nối thành công!");
+            isReconnecting = false;
             OnConnectionStatusChanged?.Invoke(true);
         };
 
@@ -63,8 +83,10 @@ public class WebSocketManager : MonoBehaviour
 
         websocket.OnClose += (c) =>
         {
-            Debug.LogWarning("[WebSocket] Đã đóng kết nối.");
+            Debug.LogWarning("[WebSocket] Đã đóng hoặc mất kết nối.");
             OnConnectionStatusChanged?.Invoke(false);
+
+            if (!isQuitting) TriggerAutoReconnect();
         };
 
         websocket.OnMessage += (bytes) =>
@@ -72,7 +94,8 @@ public class WebSocketManager : MonoBehaviour
             string rawMessage = Encoding.UTF8.GetString(bytes);
             try
             {
-                var data = JsonConvert.DeserializeObject<SignalRMessage>(rawMessage);
+                // ĐÃ ĐỔI TÊN THÀNH ServerMessage
+                var data = JsonConvert.DeserializeObject<ServerMessage>(rawMessage);
                 if (data != null && data.arguments != null && data.arguments.Length > 0)
                 {
                     ProcessServerMethod(data.target, data.arguments);
@@ -81,7 +104,32 @@ public class WebSocketManager : MonoBehaviour
             catch { /* Bỏ qua nếu tin nhắn không đúng chuẩn JSON */ }
         };
 
-        await websocket.Connect();
+        // 3. BẮT ĐẦU KẾT NỐI
+        try
+        {
+            await websocket.Connect();
+        }
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"[WebSocket] Không thể với tới Server: {ex.Message}");
+            if (!isQuitting) TriggerAutoReconnect();
+        }
+    }
+
+    // VÒNG LẶP TỰ ĐỘNG KẾT NỐI LẠI
+    private async void TriggerAutoReconnect()
+    {
+        if (isReconnecting || isQuitting) return;
+
+        isReconnecting = true;
+        Debug.Log($"[WebSocket] Sẽ thử kết nối lại sau {ReconnectDelayMs / 1000} giây...");
+
+        await Task.Delay(ReconnectDelayMs);
+
+        if (!isQuitting)
+        {
+            ConnectToServer();
+        }
     }
 
     void ProcessServerMethod(string target, object[] args)
@@ -101,19 +149,27 @@ public class WebSocketManager : MonoBehaviour
         }
     }
 
-    public async void ReconnectWithNewUrl(string newUrl)
+    public void ReconnectWithNewUrl(string newUrl)
     {
         serverUrl = newUrl.Replace("http://", "ws://");
         PlayerPrefs.SetString("WebSocket_URL", serverUrl);
 
-        if (websocket != null) await websocket.Close();
-        InitWebSocket();
+        isReconnecting = false;
+        ConnectToServer();
     }
 
-    private async void OnApplicationQuit() { if (websocket != null) await websocket.Close(); }
+    private async void OnApplicationQuit()
+    {
+        isQuitting = true;
+        if (websocket != null && websocket.State == WebSocketState.Open)
+        {
+            await websocket.Close();
+        }
+    }
 }
 
-public class SignalRMessage
+// KHUÔN MẪU DỮ LIỆU JSON ĐÃ ĐƯỢC ĐỔI TÊN
+public class ServerMessage
 {
     public string target { get; set; }
     public object[] arguments { get; set; }

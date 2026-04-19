@@ -25,6 +25,7 @@
                 <ui:Label name="hello-text" text="Xin chào quý khách" class="hello-text" />
             </ui:VisualElement>
             <ui:VisualElement name="topbar" class="topbar topbar-fixed">
+            <ui:Button name="btn-home" text="🏠" class="btn-settings" tooltip="Quay về danh sách" />
                 <ui:Button name="btn-settings" text="⚙" class="btn-settings" />
                 <ui:Label name="logo" text="TOYVERSE" class="logo" />
                 <ui:VisualElement name="live-badge" class="live-badge">
