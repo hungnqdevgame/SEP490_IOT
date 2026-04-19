@@ -31,18 +31,20 @@ public class ProductDisplay : MonoBehaviour
 
     void Start()
     {
-        if (SignalRManager.Instance != null)
+        // 1. ĐÃ ĐỔI TỪ SignalRManager SANG WebSocketManager
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnProductReceived += HandleProductReceived;
+            WebSocketManager.Instance.OnProductReceived += HandleProductReceived;
         }
         Debug.Log(apiUrlGetBySku);
     }
 
     void OnDestroy()
     {
-        if (SignalRManager.Instance != null)
+        // 2. ĐÃ ĐỔI TỪ SignalRManager SANG WebSocketManager
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnProductReceived -= HandleProductReceived;
+            WebSocketManager.Instance.OnProductReceived -= HandleProductReceived;
         }
     }
 
@@ -103,9 +105,9 @@ public class ProductDisplay : MonoBehaviour
     {
         // 1. Đổ dữ liệu Text (Giữ nguyên của bạn)
         if (nameText != null) nameText.text = data.name;
-        if (priceText != null) priceText.text = "Giá : "+ data.basePrice.ToString("N0") + " ĐỒNG";
+        if (priceText != null) priceText.text = "Giá : " + data.basePrice.ToString("N0") + " ĐỒNG";
         if (brandText != null) brandText.text = "Hãng :" + data.brand;
-        if (materialText != null) materialText.text = "Chất liệu :"+data.material;
+        if (materialText != null) materialText.text = "Chất liệu :" + data.material;
         if (ageText != null) ageText.text = "Độ tuổi : " + data.ageRange;
 
         if (typeText != null)
@@ -193,7 +195,7 @@ public class ProductDisplay : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 var response = JsonUtility.FromJson<SingleCategoryResponse>(request.downloadHandler.text);
-                if (response != null && response.data != null) typeText.text = "Loại : "  +  response.data.name;
+                if (response != null && response.data != null) typeText.text = "Loại : " + response.data.name;
             }
             else typeText.text = "Lỗi kết nối";
         }

@@ -15,18 +15,20 @@ public class TouchRotate : MonoBehaviour
         // Khởi tạo góc mục tiêu bằng góc hiện tại của Model
         targetRotation = transform.rotation;
 
-        if (SignalRManager.Instance != null)
+        // ĐÃ ĐỔI SANG WebSocketManager
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnProductRotatedEvent += OnReceiveRotationFromPi;
-            Debug.Log("✅ TouchRotate đã kết nối với SignalR!");
+            WebSocketManager.Instance.OnProductRotatedEvent += OnReceiveRotationFromPi;
+            Debug.Log("✅ TouchRotate đã kết nối với WebSocket!");
         }
     }
 
     void OnDestroy()
     {
-        if (SignalRManager.Instance != null)
+        // ĐÃ ĐỔI SANG WebSocketManager
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnProductRotatedEvent -= OnReceiveRotationFromPi;
+            WebSocketManager.Instance.OnProductRotatedEvent -= OnReceiveRotationFromPi;
         }
     }
 
