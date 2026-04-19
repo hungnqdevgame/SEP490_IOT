@@ -17,17 +17,19 @@ public class HelloMessageDisplay : MonoBehaviour
 
         if (helloPanel != null) helloPanel.SetActive(false);
 
-        if (SignalRManager.Instance != null)
+        // 1. ĐỔI TỪ SignalRManager SANG WebSocketManager
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnMessageReceivedEvent += HandleMessage;
+            WebSocketManager.Instance.OnMessageReceivedEvent += HandleMessage;
         }
     }
 
     void OnDestroy()
     {
-        if (SignalRManager.Instance != null)
+        // 2. ĐỔI TỪ SignalRManager SANG WebSocketManager
+        if (WebSocketManager.Instance != null)
         {
-            SignalRManager.Instance.OnMessageReceivedEvent -= HandleMessage;
+            WebSocketManager.Instance.OnMessageReceivedEvent -= HandleMessage;
         }
     }
 
@@ -75,6 +77,4 @@ public class HelloMessageDisplay : MonoBehaviour
             helloPanel.SetActive(false);
         }
     }
-
-
 }
