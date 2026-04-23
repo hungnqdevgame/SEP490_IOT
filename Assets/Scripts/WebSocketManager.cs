@@ -137,7 +137,19 @@ public class WebSocketManager : MonoBehaviour
         switch (target)
         {
             case "OnProductSelected":
-                OnProductReceived?.Invoke(args[0].ToString());
+            case "SelectProduct":
+                if (args != null && args.Length > 0)
+                {
+                    string barcode = args[0].ToString();
+                    Debug.Log($"[THÀNH CÔNG] Đã lọt vào case OnProductSelected! Barcode = {barcode}");
+
+                    // Phát tín hiệu cho ProductDisplay.cs
+                    OnProductReceived?.Invoke(barcode);
+                }
+                else
+                {
+                    Debug.LogError("[LỖI] Server gọi lệnh chọn sản phẩm nhưng KHÔNG gửi kèm Barcode!");
+                }
                 break;
             case "OnProductRotated":
                 OnProductRotatedEvent?.Invoke(Convert.ToSingle(args[0]));

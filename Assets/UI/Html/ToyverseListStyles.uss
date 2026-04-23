@@ -87,6 +87,9 @@
     background-color: rgb(120, 120, 120);
     border-radius: 15px;
     margin-bottom: 20px;
+    
+    /* Thêm dòng này để ảnh tự động zoom lấp đầy ô mà không bị méo */
+    -unity-background-scale-mode: scale-and-crop;
 }
 
 

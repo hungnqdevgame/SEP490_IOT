@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.0.59f2
-CRC: 671208283
+CRC: 2219211955
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c5e143d3da23e48436c11974e4c13ad8
+    Hash: 59f0f301515a677ed40c04c19b785efe
   TypeTreeHash:
     serializedVersion: 2
     Hash: d9ba6ce6ae0f42f57952f2f98b68c781
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 7204fc397fd3778992a28628d4e97ca2
+    Hash: 346f674121af2f3d03efa1f0dd1dc9d2
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -39,5 +39,6 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
-- Assets/Prefabs/A-000006-GY.prefab
+- Assets/Prefabs/A-000006-GY Red.prefab
+- Assets/Prefabs/A-000006-GY Blue.prefab
 Dependencies: []

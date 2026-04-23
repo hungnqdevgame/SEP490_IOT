@@ -1,55 +1,21 @@
 /*
-    ToyverseStyles.uss
-    Unity UI Toolkit stylesheet cho toàn bộ Toyverse Display UI.
-    Import vào cả ToyverseIdle.uxml và ToyverseProduct.uxml.
-
-    Lưu ý về animation trong UI Toolkit:
-    - USS không hỗ trợ @keyframes như CSS web.
-    - Các hiệu ứng động (blink, float, scan, progress) phải được
-      thực hiện bằng C# qua IVisualElementScheduler hoặc USS Transitions.
-    - USS Transitions (Unity 2022.1+) được khai báo ở cuối file.
-    - Class helper .anim-* dùng để C# thêm/xóa trigger transition.
+    ToyverseStyles.uss  —  Toyverse Display UI
+    Unity UI Toolkit · Unity 6 URP · Android-safe (PNG icons, no emoji)
 */
 
 /* ════════════════════════════════════════════
-   ROOT / LAYOUT
+   ROOT
 ════════════════════════════════════════════ */
 
-.idle-root {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 0px;
-    flex-grow: 1;
-    width: 100%;
-    height: 100%;
-   
-    background-color: transparent;
-}
-
+.idle-root,
 .product-root {
     flex-direction: column;
     align-items: stretch;
-    padding: 0px;
+    padding: 0;
     flex-grow: 1;
     width: 100%;
     height: 100%;
-    /* TRONG SUỐT: Canvas 3D hiện từ phía sau */
-   background-color: transparent;
-
-}
-
-/* ════════════════════════════════════════════
-   SECTION LABEL (tiêu đề nhỏ trên mỗi khối)
-════════════════════════════════════════════ */
-
-.section-label {
-    font-size: 9px;
-    color: rgb(0, 229, 255);               /* --c */
-    letter-spacing: 3px;
-    -unity-text-align: upper-center;
-    opacity: 0.6;
-    margin-bottom: 10px;
-    -unity-font-style: normal;
+    background-color: transparent;
 }
 
 /* ════════════════════════════════════════════
@@ -58,64 +24,65 @@
 
 .idle-card {
     width: 100%;
-    max-width: 800px; /* Cũ là 480px -> Tăng độ rộng tối đa */
+    max-width: 800px;
     background-color: rgb(10, 14, 26);
     border-color: rgba(0, 229, 255, 0.18);
     border-width: 1px;
     border-radius: 24px;
-    padding: 50px 30px; /* Tăng lề bên trong cho thẻ phình to ra */
+    padding: 50px 30px;
     flex-direction: column;
     align-items: center;
     align-self: center;
 }
 
-/* ── Ring wrapper ── */
-
 .idle-ring-wrap {
-  width: 150px;       /* Cũ là 96px */
+    width: 150px;
     height: 150px;
-    border-radius: 75px; 
+    border-radius: 75px;
     align-items: center;
     justify-content: center;
     margin-bottom: 24px;
     position: relative;
     border-color: rgba(0, 229, 255, 0.18);
-    border-width: 2px;
+    border-width: 1.5px;
 }
 
-/* Outer ring — rotates via C# scheduler */
 .idle-ring-outer {
-   position: absolute;
+    position: absolute;
     top: -12px; left: -12px; right: -12px; bottom: -12px;
     border-radius: 87px;
     border-color: rgba(0, 229, 255, 0.1);
     border-width: 1px;
 }
 
-/* Inner dashed ring */
 .idle-ring-inner {
- position: absolute;
+    position: absolute;
     top: 10px; left: 10px; right: 10px; bottom: 10px;
     border-radius: 65px;
     border-color: rgba(0, 229, 255, 0.15);
     border-width: 1.5px;
 }
 
-/* Base ring border */
-.idle-ring-wrap {
-    border-color: rgba(0, 229, 255, 0.18);
-    border-width: 1.5px;
-}
-
+/*
+   IDLE ICON — dùng PNG thay emoji (Android-safe)
+   Đặt file search.png vào Assets/UI/Icons/
+   Import setting: Texture Type = Sprite, Alpha Source = Input Texture Alpha
+*/
 .idle-icon {
-    font-size: 60px; /* Cũ là 38px -> Icon to rõ ràng */
-    -unity-text-align: middle-center;
+    width: 72px;
+    height: 72px;
+    background-color: transparent;
+    background-image: url("project://database/Assets/UI/Icons/search.png");
+    -unity-background-scale-mode: scale-to-fit;
+    
+    /* Đổi màu nhuộm thành Trắng tinh để icon sáng và nổi bật nhất */
+    -unity-background-image-tint-color: rgb(255, 255, 255);
+    
+    border-width: 0;
 }
-
-/* ── Idle text ── */
 
 .idle-title {
-   font-size: 24px; /* Cũ là 14px -> Tiêu đề to gấp đôi */
+    font-size: 24px;
     color: rgb(232, 244, 255);
     letter-spacing: 2px;
     -unity-text-align: upper-center;
@@ -123,57 +90,46 @@
 }
 
 .idle-sub {
-    font-size: 32px; /* Cũ là 12px */
+    font-size: 32px;
     color: rgb(122, 154, 187);
     -unity-text-align: upper-center;
     white-space: normal;
     margin-bottom: 45px;
 }
 
-/* ── Progress bar ── */
-
 .idle-bar {
     width: 100%;
     height: 2px;
-    background-color: rgba(0, 229, 255, 0.08); /* --bdl */
+    background-color: rgba(0, 229, 255, 0.08);
     border-radius: 2px;
     overflow: hidden;
 }
 
 .idle-fill {
     height: 100%;
-    width: 0%;                             /* animated by C# */
-    background-color: rgb(0, 229, 255);    /* --c */
+    width: 0%;
+    background-color: rgb(0, 229, 255);
     border-radius: 2px;
-}
-
-/* USS Transition for progress bar (Unity 2022.1+) */
-.idle-fill {
     transition-property: width;
     transition-duration: 2500ms;
     transition-timing-function: ease-in-out;
 }
 
 /* ════════════════════════════════════════════
-   PRODUCT FRAME CARD
+   FRAME
 ════════════════════════════════════════════ */
 
 .frame {
     flex-grow: 1;
     width: 100%;
     height: 100%;
-    /* Trong suốt — Canvas 3D Unity hiện từ phía sau */
-    background-color: rgba(0, 0, 0, 0);
+    background-color: transparent;
     border-color: rgba(0, 229, 255, 0.18);
     border-width: 1px;
-    border-radius: 0px;
     overflow: hidden;
-    /* QUAN TRỌNG: relative để info-panel absolute hoạt động đúng */
     position: relative;
-    background-color: transparent;
 }
 
-/* Scan line — position.y animated by C# */
 .scan-line {
     position: absolute;
     left: 0; right: 0;
@@ -184,57 +140,24 @@
 }
 
 /* ── Corner decorations ── */
-
-.corner {
-    position: absolute;
-    width: 14px;
-    height: 14px;
-}
-
-/* Simulated ::before / ::after via child elements in UXML */
-/* Use VisualElement children styled below if needed,        */
-/* OR draw corners in C# using Painter2D in a custom element */
-
+.corner { position: absolute; width: 14px; height: 14px; }
 .corner-tl { top: 8px;    left: 8px;  }
 .corner-tr { top: 8px;    right: 8px; }
 .corner-bl { bottom: 8px; left: 8px;  }
 .corner-br { bottom: 8px; right: 8px; }
 
-/* Each corner has two arms (horizontal + vertical) */
-/* Implemented as background with border trick: */
-
-.corner-tl {
-    border-top-width: 1.5px;
-    border-left-width: 1.5px;
-    border-top-color: rgb(0, 229, 255);
-    border-left-color: rgb(0, 229, 255);
-    border-right-width: 0;
-    border-bottom-width: 0;
-}
-.corner-tr {
-    border-top-width: 1.5px;
-    border-right-width: 1.5px;
-    border-top-color: rgb(0, 229, 255);
-    border-right-color: rgb(0, 229, 255);
-    border-left-width: 0;
-    border-bottom-width: 0;
-}
-.corner-bl {
-    border-bottom-width: 1.5px;
-    border-left-width: 1.5px;
-    border-bottom-color: rgb(0, 229, 255);
-    border-left-color: rgb(0, 229, 255);
-    border-top-width: 0;
-    border-right-width: 0;
-}
-.corner-br {
-    border-bottom-width: 1.5px;
-    border-right-width: 1.5px;
-    border-bottom-color: rgb(0, 229, 255);
-    border-right-color: rgb(0, 229, 255);
-    border-top-width: 0;
-    border-left-width: 0;
-}
+.corner-tl { border-top-width: 1.5px; border-left-width: 1.5px;
+             border-top-color: rgb(0,229,255); border-left-color: rgb(0,229,255);
+             border-right-width: 0; border-bottom-width: 0; }
+.corner-tr { border-top-width: 1.5px; border-right-width: 1.5px;
+             border-top-color: rgb(0,229,255); border-right-color: rgb(0,229,255);
+             border-left-width: 0; border-bottom-width: 0; }
+.corner-bl { border-bottom-width: 1.5px; border-left-width: 1.5px;
+             border-bottom-color: rgb(0,229,255); border-left-color: rgb(0,229,255);
+             border-top-width: 0; border-right-width: 0; }
+.corner-br { border-bottom-width: 1.5px; border-right-width: 1.5px;
+             border-bottom-color: rgb(0,229,255); border-right-color: rgb(0,229,255);
+             border-top-width: 0; border-left-width: 0; }
 
 /* ════════════════════════════════════════════
    TOP BAR
@@ -244,18 +167,143 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 30px;
+    padding: 0 30px;
+    height: 80px;
     border-bottom-width: 1px;
     border-bottom-color: rgba(0, 229, 255, 0.08);
     background-color: rgba(0, 229, 255, 0.025);
-    height: 80px;
 }
 
-.logo {
-    font-size: 24px;
-    color: rgb(0, 229, 255);
-    letter-spacing: 3px;
+.topbar-fixed {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    background-color: rgba(6, 10, 18, 0.88);
+    border-bottom-width: 1px;
+    border-bottom-color: rgba(0, 229, 255, 0.1);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 84px;
 }
+
+.nav-group {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 1;
+    gap: 4px;
+}
+
+/* ════════════════════════════════════════════
+   NÚT QUAY LẠI  (.btn-back)
+   Pill có border cyan + icon PNG + label
+════════════════════════════════════════════ */
+
+.btn-back {
+    /* Reset Unity Button defaults */
+    background-color: rgba(0, 229, 255, 0.07);
+    border-color: rgba(0, 229, 255, 0.4);
+    border-width: 1px;
+    border-radius: 100px;
+    padding: 0 20px 0 14px;
+    height: 58px;
+    margin: 0;
+
+    /* Layout children ngang */
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    transition-property: background-color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+}
+
+.btn-back:hover {
+    background-color: rgba(0, 229, 255, 0.15);
+    border-color: rgb(0, 229, 255);
+}
+
+.btn-back:active {
+    background-color: rgba(0, 229, 255, 0.25);
+}
+
+/*
+   Icon mũi tên ← (arrow_back.png)
+   Đặt file arrow_back.png vào Assets/UI/Icons/
+*/
+.btn-back__icon {
+    width: 34px;
+    height: 34px;
+    margin-right: 10px;
+    background-image: url("project://database/Assets/UI/Icons/arrow_back.png");
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgb(0, 229, 255);
+    flex-shrink: 0;
+}
+
+.btn-back__label {
+    font-size: 26px;
+    color: rgb(0, 229, 255);
+    letter-spacing: 2px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}
+
+/* ════════════════════════════════════════════
+   NÚT ICON VUÔNG  (.btn-icon-sq)
+   Dùng cho Settings — chỉ có icon PNG, không text
+════════════════════════════════════════════ */
+
+.btn-icon-sq {
+    background-color: rgba(0, 229, 255, 0.07);
+    border-color: rgba(0, 229, 255, 0.3);
+    border-width: 1px;
+    border-radius: 16px;
+    width: 60px;
+    height: 58px;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: center;
+
+    transition-property: background-color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+}
+
+.btn-icon-sq:hover {
+    background-color: rgba(0, 229, 255, 0.15);
+    border-color: rgb(0, 229, 255);
+}
+
+.btn-icon-sq:active {
+    background-color: rgba(0, 229, 255, 0.25);
+}
+
+/*
+   Icon settings.png
+   Đặt file settings.png vào Assets/UI/Icons/
+*/
+.btn-icon-sq__img {
+    width: 34px;
+    height: 34px;
+    background-image: url("project://database/Assets/UI/Icons/settings.png");
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: rgba(0, 229, 255, 0.75);
+
+    transition-property: -unity-background-image-tint-color;
+    transition-duration: 150ms;
+}
+
+.btn-icon-sq:hover .btn-icon-sq__img {
+    -unity-background-image-tint-color: rgb(0, 229, 255);
+}
+
+/* ════════════════════════════════════════════
+   LIVE BADGE
+════════════════════════════════════════════ */
 
 .live-badge {
     flex-direction: row;
@@ -267,8 +315,7 @@
     height: 10px;
     border-radius: 3px;
     background-color: rgb(0, 255, 136);
-    margin-right: 5px;
-    /* opacity blink driven by C# */
+    margin-right: 6px;
 }
 
 .live-text {
@@ -277,166 +324,28 @@
 }
 
 /* ════════════════════════════════════════════
-   3D VIEWER
+   INFO PANEL (ghim đáy)
 ════════════════════════════════════════════ */
 
-/* .viewer đã bị xóa khỏi UXML — Canvas 3D phía sau UIDocument */
-.viewer-UNUSED {
-    flex-grow: 1;
-    height: 260px;
-    background-color: rgb(8, 18, 42);
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
+.info-panel {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
     flex-direction: column;
+    background-color: rgba(6, 10, 18, 0.96);
+    border-top-width: 1px;
+    border-top-color: rgba(0, 229, 255, 0.15);
 }
-
-/* Grid overlay — drawn with background repeat */
-.viewer-grid {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    /* 
-       Grid lines: UI Toolkit does not support background-image CSS patterns.
-       Use a tiled Texture2D assigned via C#:
-           viewerGrid.style.backgroundImage = gridTexture;
-       OR draw with Painter2D in a custom VisualElement.
-    */
-    opacity: 0.5;
-}
-
-/* Bottom glow */
-.viewer-glow-UNUSED {
-    position: absolute;
-    bottom: 0;
-    width: 200px;
-    height: 80px;
-    /* 
-       Radial gradient not supported in USS directly.
-       Assign a soft radial glow Texture2D via C# or use a custom element.
-    */
-    left: 50%;
-    translate: -50% 0;   /* USS 2023.2+; fallback: set via C# marginLeft */
-}
-
-/* Product 3D container — float animation driven by C# */
-.product-3d-UNUSED {
-    align-items: center;
-    justify-content: center;
-    width: 600px;
-    height: 600px;
-    /* translateY animated by C# scheduler */
-}
-
-.product-emoji-UNUSED {
-    font-size: 88px;
-    -unity-text-align: middle-center;
-    /*
-        drop-shadow not available in USS.
-        Use a UI Effects layer or custom shader for glow.
-    */
-}
-
-/* Shadow under product — size & opacity animated by C# */
-.product-shadow-UNUSED {
-    position: absolute;
-    bottom: -20px;
-    width: 80px;
-    height: 12px;
-    border-radius: 40px;
-    background-color: rgba(0, 229, 255, 0.18);
-    align-self: center;
-    /* scale & opacity animated by C# to match float */
-}
-
-/* ── View angle buttons ── */
-
-.view-angles {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    /* marginTop set to -half-height via C# */
-    flex-direction: column;
-}
-
-.angle-btn {
-    width: 32px;
-    height: 32px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-color: rgba(0, 229, 255, 0.18);
-    border-width: 1px;
-    border-radius: 8px;
-    color: rgb(122, 154, 187);
-    font-size: 10px;
-    margin-bottom: 6px;
-    -unity-text-align: middle-center;
-   
-}
-
-.angle-active {
-    background-color: rgba(0, 229, 255, 0.15);
-    border-color: rgb(0, 229, 255);
-    color: rgb(0, 229, 255);
-}
-
-/* USS Transition for angle btn hover */
-.angle-btn {
-    transition-property: background-color, border-color, color;
-    transition-duration: 150ms;
-    transition-timing-function: ease;
-}
-
-/* ── Rotate hint ── */
-
-.rotate-hint {
-    position: absolute;
-    bottom: 12px;
-    flex-direction: row;
-    align-items: center;
-    align-self: center;
-}
-
-.rotate-arrow {
-    width: 18px;
-    height: 18px;
-    border-color: rgb(58, 90, 122);        /* --t3 */
-    border-width: 1px;
-    border-radius: 4px;
-    align-items: center;
-    justify-content: center;
-}
-
-.arrow-label {
-    font-size: 9px;
-    color: rgb(58, 90, 122);
-    -unity-text-align: middle-center;
-}
-
-.rotate-hint-text {
-    font-size: 10px;
-    color: rgb(58, 90, 122);
-    letter-spacing: 1px;
-    margin-left: 4px;
-    margin-right: 4px;
-}
-
-/* ════════════════════════════════════════════
-   PRODUCT INFO ROW
-════════════════════════════════════════════ */
 
 .info-row {
-    padding: 24px 24px 16px;
+    padding: 14px 18px 10px;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
-    padding: 14px 18px 10px;
     border-bottom-width: 1px;
     border-bottom-color: rgba(0, 229, 255, 0.08);
 }
 
-.info-left {
-    flex-direction: column;
-}
+.info-left { flex-direction: column; }
 
 .prod-name {
     font-size: 40px;
@@ -475,21 +384,21 @@
 }
 
 .tab {
-    padding: 18px 10px;
     flex: 1;
     padding: 10px;
     font-size: 23px;
     letter-spacing: 1px;
     color: rgb(58, 90, 122);
-    background-color: rgba(0,0,0,0);
+    background-color: transparent;
     border-width: 0;
     border-bottom-width: 2px;
-    border-bottom-color: rgba(0,0,0,0);
+    border-bottom-color: transparent;
     -unity-text-align: middle-center;
-   
     transition-property: color, border-bottom-color, background-color;
     transition-duration: 150ms;
 }
+
+.tab:hover { color: rgba(0, 229, 255, 0.7); }
 
 .tab-active {
     color: rgb(0, 229, 255);
@@ -497,26 +406,18 @@
     background-color: rgba(0, 229, 255, 0.04);
 }
 
-/* ════════════════════════════════════════════
-   TAB CONTENT
-════════════════════════════════════════════ */
-
 .tab-content {
     flex-direction: column;
     min-height: 290px;
 }
 
-.tab-content-hidden {
-    display: none;
-}
+.tab-content-hidden { display: none; }
 
 /* ════════════════════════════════════════════
-   COLOR PICKER
+   COLOR SWATCHES
 ════════════════════════════════════════════ */
 
-.color-section {
-    padding: 25px 25px;
-}
+.color-section { padding: 25px 25px; }
 
 .sec-label {
     font-size: 24px;
@@ -534,20 +435,18 @@
     width: 60px;
     height: 60px;
     border-radius: 10px;
-    border-color: rgba(0,0,0,0);
+    border-color: transparent;
     border-width: 2px;
     margin-right: 10px;
     align-items: center;
     justify-content: center;
-    
     transition-property: border-color;
     transition-duration: 150ms;
 }
 
-.swatch-active {
-    border-color: rgb(0, 229, 255);
-    /* box-shadow not supported — glow via custom effect or shader */
-}
+.swatch:hover { border-color: rgba(0, 229, 255, 0.6); }
+
+.swatch-active { border-color: rgb(0, 229, 255); }
 
 .swatch-check {
     font-size: 14px;
@@ -556,20 +455,16 @@
     opacity: 0;
 }
 
-.swatch-active .swatch-check {
-    opacity: 1;
-}
+.swatch-active .swatch-check { opacity: 1; }
 
 /* ════════════════════════════════════════════
-   SPEC CHIPS GRID (overview)
+   SPEC CHIPS
 ════════════════════════════════════════════ */
 
 .specs-grid {
     flex-direction: row;
     flex-wrap: wrap;
     padding: 0 24px 24px;
-    /* KHÔNG dùng justify-content: space-between */
-   
 }
 
 .spec-chip {
@@ -584,7 +479,6 @@
     flex-direction: column;
     padding: 14px 16px;
     margin-bottom: 10px;
-    margin-right: 8px;
     overflow: visible;
 }
 
@@ -606,13 +500,10 @@
 }
 
 /* ════════════════════════════════════════════
-   FEATURES LIST (specs tab)
+   FEATURES (specs tab)
 ════════════════════════════════════════════ */
 
-.features {
-    padding: 0 18px 14px;
-    flex-direction: column;
-}
+.features { padding: 0 18px 14px; flex-direction: column; }
 
 .feat-row {
     flex-direction: row;
@@ -625,18 +516,8 @@
     margin-bottom: 6px;
 }
 
-.feat-icon {
-    font-size: 16px;
-    width: 24px;
-    -unity-text-align: middle-center;
-    margin-right: 10px;
-}
-
-.feat-text {
-    font-size: 12px;
-    color: rgb(232, 244, 255);
-    flex-grow: 1;
-}
+.feat-icon { font-size: 16px; width: 24px; -unity-text-align: middle-center; margin-right: 10px; }
+.feat-text { font-size: 12px; color: rgb(232, 244, 255); flex-grow: 1; }
 
 .feat-badge {
     font-size: 9px;
@@ -646,94 +527,13 @@
     -unity-text-align: middle-center;
 }
 
-.badge-cyan {
-    background-color: rgba(0, 229, 255, 0.12);
-    color: rgb(0, 229, 255);
-    border-color: rgba(0, 229, 255, 0.25);
-    border-width: 1px;
-}
-
-.badge-gold {
-    background-color: rgba(255, 215, 0, 0.1);
-    color: rgb(255, 215, 0);
-    border-color: rgba(255, 215, 0, 0.25);
-    border-width: 1px;
-}
-
-.badge-green {
-    background-color: rgba(0, 255, 136, 0.1);
-    color: rgb(0, 255, 136);
-    border-color: rgba(0, 255, 136, 0.25);
-    border-width: 1px;
-}
+.badge-cyan  { background-color: rgba(0,229,255,0.12); color: rgb(0,229,255);   border-color: rgba(0,229,255,0.25);   border-width: 1px; }
+.badge-gold  { background-color: rgba(255,215,0,0.1);  color: rgb(255,215,0);   border-color: rgba(255,215,0,0.25);   border-width: 1px; }
+.badge-green { background-color: rgba(0,255,136,0.1);  color: rgb(0,255,136);   border-color: rgba(0,255,136,0.25);   border-width: 1px; }
 
 /* ════════════════════════════════════════════
-   USS TRANSITIONS (Unity 2022.1+)
-   Hover states — Unity triggers :hover pseudo-class
+   IDLE / HELLO OVERLAYS
 ════════════════════════════════════════════ */
-
-.angle-btn:hover {
-    background-color: rgba(0, 229, 255, 0.1);
-    border-color: rgba(0, 229, 255, 0.6);
-    color: rgb(0, 229, 255);
-}
-
-.tab:hover {
-    color: rgba(0, 229, 255, 0.7);
-}
-
-.swatch:hover {
-    border-color: rgba(0, 229, 255, 0.6);
-}
-
-
-/* ══════════════════════════════════════════════════════
-   Canvas 3D Mode — UIDocument trong suốt vùng model
-   Canvas Unity nằm PHÍA SAU UIDocument, Camera render
-   thẳng lên màn hình, không cần viewer element trong UXML.
-   
-   frame: background trong suốt để nhìn xuyên qua Canvas,
-   nhưng vẫn giữ layout các section phía dưới.
-══════════════════════════════════════════════════════ */
-.frame {
-    background-color: rgba(0, 0, 0, 0);
-}
-
-
-/* ════════════════════════════════════════════
-   INFO PANEL — ghim cứng xuống đáy frame
-   position: absolute bottom:0 → không bao giờ
-   di chuyển dù layout phía trên thay đổi.
-   Phần frame phía trên trong suốt → Canvas 3D lộ ra.
-════════════════════════════════════════════ */
-.info-panel {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    flex-direction: column;
-    /* Background đặc để chữ đọc được trên nền Canvas 3D */
-    background-color: rgba(6, 10, 18, 0.96);
-    border-top-width: 1px;
-    border-top-color: rgba(0, 229, 255, 0.15);
-}
-
-/* topbar cũng ghim absolute ở trên cùng */
-.topbar-fixed {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(6, 10, 18, 0.85);
-    border-bottom-width: 1px;
-    border-bottom-color: rgba(0, 229, 255, 0.08);
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-   padding: 0 30px; 
-    height: 90px;
-
-}
 
 .idle-overlay {
     position: absolute;
@@ -745,9 +545,7 @@
 
 .hello-panel {
     position: absolute;
-    top: 15%; /* Nằm ở nửa trên màn hình */
-    left: 10%;
-    right: 10%;
+    top: 15%; left: 10%; right: 10%;
     background-color: rgba(6, 10, 18, 0.95);
     border-color: rgba(0, 229, 255, 0.6);
     border-width: 2px;
@@ -755,34 +553,26 @@
     padding: 40px 30px;
     align-items: center;
     justify-content: center;
-    display : none;
+    display: none;
 }
 
 .hello-text {
-    font-size: 55px; /* Chữ to nổi bật */
-    color: rgb(255, 255, 255);
+    font-size: 55px;
+    color: white;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
     white-space: normal;
 }
 
 /* ════════════════════════════════════════════
-   SETTINGS PANEL (Bảng cài đặt)
+   SETTINGS PANEL
 ════════════════════════════════════════════ */
-.btn-settings {
-    background-color: transparent; border-width: 0;
-    color: rgb(0, 229, 255); font-size: 40px;
-    margin-right: 25px; padding: 0;
-    width: 60px;
-    height: 60px;
-    -unity-text-align: middle-center;
-}
 
 .settings-panel {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(6, 10, 18, 0.98); /* Nền mờ tối */
+    background-color: rgba(6, 10, 18, 0.98);
     align-items: center; justify-content: center;
-    display: none; /* Ẩn mặc định */
+    display: none;
 }
 
 .settings-box {
@@ -797,11 +587,8 @@
     -unity-text-align: middle-center; margin-bottom: 30px; letter-spacing: 2px;
 }
 
-.settings-label {
-    font-size: 16px; color: rgb(122, 154, 187); margin-bottom: 10px;
-}
+.settings-label { font-size: 16px; color: rgb(122, 154, 187); margin-bottom: 10px; }
 
-/* Ghi đè style mặc định của ô nhập Text Unity */
 .settings-input > .unity-text-field__input {
     background-color: rgba(0, 229, 255, 0.05);
     border-color: rgba(0, 229, 255, 0.3); border-width: 1px; border-radius: 8px;
@@ -809,7 +596,6 @@
 }
 
 .settings-input { margin-bottom: 40px; }
-
 .settings-actions { flex-direction: row; justify-content: space-between; }
 
 .settings-btn {
@@ -818,9 +604,43 @@
 }
 
 .btn-primary {
-    background-color: rgba(0, 229, 255, 0.2); border-color: rgb(0, 229, 255); color: rgb(0, 229, 255);
+    background-color: rgba(0, 229, 255, 0.2);
+    border-color: rgb(0, 229, 255);
+    color: rgb(0, 229, 255);
 }
 
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.3); color: white;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* ════════════════════════════════════════════
+   VIEW ANGLE BUTTONS (unused but kept)
+════════════════════════════════════════════ */
+
+.angle-btn {
+    width: 32px; height: 32px;
+    background-color: rgba(0,0,0,0.5);
+    border-color: rgba(0,229,255,0.18); border-width: 1px; border-radius: 8px;
+    color: rgb(122,154,187); font-size: 10px; margin-bottom: 6px;
+    -unity-text-align: middle-center;
+    transition-property: background-color, border-color, color;
+    transition-duration: 150ms;
+}
+
+.angle-btn:hover { background-color: rgba(0,229,255,0.1); border-color: rgba(0,229,255,0.6); color: rgb(0,229,255); }
+.angle-active    { background-color: rgba(0,229,255,0.15); border-color: rgb(0,229,255); color: rgb(0,229,255); }
+
+/* ════════════════════════════════════════════
+   SECTION LABEL
+════════════════════════════════════════════ */
+
+.section-label {
+    font-size: 9px;
+    color: rgb(0, 229, 255);
+    letter-spacing: 3px;
+    -unity-text-align: upper-center;
+    opacity: 0.6;
+    margin-bottom: 10px;
 }
