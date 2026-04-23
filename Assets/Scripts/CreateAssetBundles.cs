@@ -16,10 +16,9 @@ public class CreateAssetBundles
             Directory.CreateDirectory(assetBundleDirectory);
         }
 
-        // ĐÃ TỐI ƯU: Đổi từ None sang ChunkBasedCompression (LZ4)
         BuildPipeline.BuildAssetBundles(assetBundleDirectory,
-                                        BuildAssetBundleOptions.ChunkBasedCompression,
-                                        BuildTarget.StandaloneWindows64);
+                                        BuildAssetBundleOptions.None,
+                                        BuildTarget.Android);
     }
 }
 #endif

@@ -157,6 +157,32 @@ public class ToyverseListController : MonoBehaviour
         var titleLabel = card.Q<Label>("card-title");
         if (titleLabel != null) titleLabel.text = item.name;
 
+        // --- XỬ LÝ TẢI ẢNH TỪ SERVER ---
+        var imgBox = card.Q<VisualElement>("card-img");
+        if (imgBox != null)
+        {
+            // Reset ảnh cũ về null (để tránh bị ám ảnh từ sản phẩm trang trước)
+            imgBox.style.backgroundImage = null;
+
+            // Tìm link ảnh trong mảng colors
+            string imageUrl = "";
+            if (item.colors != null && item.colors.Count > 0 && !string.IsNullOrEmpty(item.colors[0].imageUrl))
+            {
+                imageUrl = item.colors[0].imageUrl;
+                if (imageUrl.EndsWith(".webp", System.StringComparison.OrdinalIgnoreCase))
+                {
+                    imageUrl = imageUrl.Substring(0, imageUrl.Length - 5) + ".png";
+                }
+            }
+
+            // Gọi hàm tải ảnh
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                StartCoroutine(LoadImageRoutine(imageUrl, imgBox));
+            }
+        }
+        // --------------------------------
+
         var toggle = card.Q<Toggle>("card-toggle");
         if (toggle != null)
         {
@@ -170,10 +196,31 @@ public class ToyverseListController : MonoBehaviour
         var btnShow = card.Q<Button>("btn-show");
         if (btnShow != null)
         {
-            // Truyền dữ liệu item vào nút và đăng ký hàm Click mới
             btnShow.userData = item;
             btnShow.UnregisterCallback<ClickEvent>(OnShowItemClicked);
             btnShow.RegisterCallback<ClickEvent>(OnShowItemClicked);
+        }
+    }
+    private IEnumerator LoadImageRoutine(string url, VisualElement imgBox)
+    {
+        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(url))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                // Lấy ảnh tải về thành công
+                Texture2D texture = DownloadHandlerTexture.GetContent(request);
+                if (texture != null && imgBox != null)
+                {
+                    // Đắp ảnh vào làm Background cho VisualElement
+                    imgBox.style.backgroundImage = new StyleBackground(texture);
+                }
+            }
+            else
+            {
+                Debug.LogError($"[LỖI TẢI ẢNH] Không thể tải {url}. Lỗi: {request.error}");
+            }
         }
     }
     private void OnShowItemClicked(ClickEvent evt)

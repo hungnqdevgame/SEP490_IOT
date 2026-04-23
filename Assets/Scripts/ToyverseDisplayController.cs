@@ -232,6 +232,12 @@ public class ToyverseDisplayController : MonoBehaviour
         var helloText = _productView?.Q<Label>("hello-text");
         if (helloPanel == null || helloText == null) return;
 
+        if (text == "1" || text == "2" || text == "3" || text == "4" || text == "5")
+        {
+            // Kết thúc hàm luôn, bỏ qua việc bật hello-panel
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(text))
         {
             helloPanel.style.display = DisplayStyle.None;

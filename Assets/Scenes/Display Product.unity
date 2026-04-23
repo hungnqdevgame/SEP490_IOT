@@ -500,8 +500,8 @@ MonoBehaviour:
   carouselContent: {fileID: 0}
   carouselScript: {fileID: 0}
   modelLoader: {fileID: 471902955}
-  apiUrlGetBySku: http://localhost:5035/api/Product/barcode/
-  bundleServerUrl: http://localhost:5035/
+  apiUrlGetBySku: https://toyshelf.io.vn/api/Product/barcode/
+  bundleServerUrl: https://toyshelf.io.vn/
 --- !u!4 &471902953
 Transform:
   m_ObjectHideFlags: 0
@@ -640,67 +640,6 @@ MonoBehaviour:
   apiUrlGetBySku: https://toyshelf.io.vn/api/Product/barcode/
   apiUrlCategory: https://toyshelf.io.vn/api/ProductCategory/
   bundleServerUrl: https://toyshelf.io.vn/
---- !u!1001 &626520057
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 8603166960496175128, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_Name
-      value: A-000006-GY
-      objectReference: {fileID: 0}
-    - target: {fileID: 8603166960496175128, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
-      objectReference: {fileID: 0}
-    - target: {fileID: 8948448398263988898, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: e5c8c5c0985dfa34888066af13b3f60d, type: 3}
 --- !u!1 &898156443
 GameObject:
   m_ObjectHideFlags: 0
@@ -1000,4 +939,3 @@ SceneRoots:
   - {fileID: 172619478}
   - {fileID: 387121843}
   - {fileID: 898156446}
-  - {fileID: 626520057}
