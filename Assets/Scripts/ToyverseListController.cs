@@ -155,7 +155,7 @@ public class ToyverseListController : MonoBehaviour
     private void BindCardData(VisualElement card, ProductItem item)
     {
         var titleLabel = card.Q<Label>("card-title");
-        if (titleLabel != null) titleLabel.text = item.name;
+        if (titleLabel != null) titleLabel.text = string.IsNullOrEmpty(item.name) ? "" : item.name.Trim();
 
         // --- XỬ LÝ TẢI ẢNH TỪ SERVER ---
         var imgBox = card.Q<VisualElement>("card-img");

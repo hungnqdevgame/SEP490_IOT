@@ -105,7 +105,7 @@ public class ProductDisplay : MonoBehaviour
     {
         // 1. Đổ dữ liệu Text (Giữ nguyên của bạn)
         if (nameText != null) nameText.text = data.name;
-        if (priceText != null) priceText.text = "Giá : " + data.basePrice.ToString("N0") + " ĐỒNG";
+        if (priceText != null) priceText.text = "Giá : " + data.price.ToString("N0") + " ĐỒNG";
         if (brandText != null) brandText.text = "Hãng :" + data.brand;
         if (materialText != null) materialText.text = "Chất liệu :" + data.material;
         if (ageText != null) ageText.text = "Độ tuổi : " + data.ageRange;
@@ -175,8 +175,14 @@ public class ProductDisplay : MonoBehaviour
     {
         if (string.IsNullOrEmpty(modelSku)) return;
 
-        Debug.Log($"[HIỂN THỊ] Đã chọn màu! Đang gọi tải Model 3D: {modelSku}");
+        // [MỚI] Tường lửa chặn click: Nếu đang tải thì thoát hàm luôn (return)
+        if (modelLoader != null && modelLoader.isLoading == true)
+        {
+            Debug.LogWarning("⏳ [HỆ THỐNG] Đang tải mô hình, xin vui lòng đợi...");
+            return;
+        }
 
+        Debug.Log($"[HIỂN THỊ] Đã chọn màu! Đang gọi tải Model 3D: {modelSku}");
         string fullBundleUrl = bundleServerUrl + modelSku.ToLower();
 
         if (modelLoader != null)
@@ -200,4 +206,6 @@ public class ProductDisplay : MonoBehaviour
             else typeText.text = "Lỗi kết nối";
         }
     }
-}
+
+   
+    }

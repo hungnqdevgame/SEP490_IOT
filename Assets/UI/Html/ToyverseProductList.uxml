@@ -14,7 +14,7 @@
                 <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
                 <ui:VisualElement class="card-actions">
                     <ui:Toggle name="card-toggle" class="card-toggle" />
-                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                    <ui:Button name="btn-show" text="Hiển thị" class="btn-show" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -23,7 +23,7 @@
                 <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
                 <ui:VisualElement class="card-actions">
                     <ui:Toggle name="card-toggle" class="card-toggle" />
-                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                    <ui:Button name="btn-show" text="Hiển thị" class="btn-show" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -32,7 +32,7 @@
                 <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
                 <ui:VisualElement class="card-actions">
                     <ui:Toggle name="card-toggle" class="card-toggle" />
-                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                    <ui:Button name="btn-show" text="Hiển thị" class="btn-show" />
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -41,7 +41,7 @@
                 <ui:Label name="card-title" text="Tên Sản Phẩm" class="card-title" />
                 <ui:VisualElement class="card-actions">
                     <ui:Toggle name="card-toggle" class="card-toggle" />
-                    <ui:Button name="btn-show" text="Show" class="btn-show" />
+                    <ui:Button name="btn-show" text="Hiển thị" class="btn-show" />
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
