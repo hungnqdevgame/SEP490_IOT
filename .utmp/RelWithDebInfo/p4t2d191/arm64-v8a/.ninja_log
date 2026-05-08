@@ -44,3 +44,21 @@
 174	20397	7986232965010325	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	3537670386b5e0ca
 251	20610	7986232967138586	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	9cbd685e339629f3
 20611	21476	7986232975824812	D:/Unity Project/SEP490/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/p4t2d191/obj/arm64-v8a/libgame.so	ba20b8f252e4053c
+64	8470	7995794753046756	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	4c7ad2db7d2e637
+96	8533	7995794753001047	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	e93c5760956c7b04
+109	8812	7995794755703692	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1f4fcc3278160aeb
+51	8891	7995794757038696	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	b2fad20c007eecd
+83	9195	7995794760977865	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5927ba129a334172
+123	9506	7995794764152144	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	f951f597dd270fd5
+38	9592	7995794765122903	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	3537670386b5e0ca
+137	9952	7995794768714189	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	9cbd685e339629f3
+9953	10295	7995794772246154	D:/Unity Project/SEP490/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/p4t2d191/obj/arm64-v8a/libgame.so	ba20b8f252e4053c
+38	13787	7995871856438029	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	4c7ad2db7d2e637
+114	13810	7995871858381433	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	1f4fcc3278160aeb
+100	13822	7995871856438029	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	e93c5760956c7b04
+87	13976	7995871860446205	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5927ba129a334172
+55	14082	7995871861641996	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	b2fad20c007eecd
+140	14115	7995871862033409	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	9cbd685e339629f3
+127	14418	7995871865127418	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	f951f597dd270fd5
+69	14687	7995871867818606	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	3537670386b5e0ca
+14687	15052	7995871871481995	D:/Unity Project/SEP490/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/p4t2d191/obj/arm64-v8a/libgame.so	ba20b8f252e4053c

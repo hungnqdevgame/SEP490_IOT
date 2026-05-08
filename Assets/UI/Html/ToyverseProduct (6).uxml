@@ -45,7 +45,10 @@
                         <ui:Label name="prod-name" text="TITAN X9" class="prod-name" />
                         <ui:Label name="prod-sub" text="Robot Điều Khiển · Series 2025" class="prod-sub" />
                     </ui:VisualElement>
-                    <ui:Label name="prod-id" text="CT-000001-BL" class="prod-id" />
+                   <ui:VisualElement name="info-right" class="info-right">
+    <ui:Label name="prod-id" text="CT-000001-BL" class="prod-id" />
+    <ui:Button name="btn-delete" text="XÓA" class="btn-delete" />
+</ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="tabs" class="tabs">
                     <ui:Button name="tab-overview" text="TỔNG QUAN" class="tab tab-active" />

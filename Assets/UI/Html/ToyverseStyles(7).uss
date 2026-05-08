@@ -345,13 +345,19 @@
     border-bottom-color: rgba(0, 229, 255, 0.08);
 }
 
-.info-left { flex-direction: column; }
+.info-left { 
+    flex-direction: column; 
+    flex-shrink: 1; 
+    margin-right: 20px; 
+}
 
 .prod-name {
+   
     font-size: 40px;
     color: rgb(255, 255, 255);
     letter-spacing: 1px;
     -unity-font-style: bold;
+    white-space: normal;
 }
 
 .prod-sub {
@@ -449,8 +455,9 @@
 .swatch-active { border-color: rgb(0, 229, 255); }
 
 .swatch-check {
-    font-size: 14px;
+   font-size: 40px;                 /* TĂNG THÔNG SỐ NÀY LÊN (Bản cũ của bạn đang là 14px) */
     color: white;
+    -unity-font-style: bold;         /* Thêm dòng này để dấu tích dày và đậm nét hơn */
     -unity-text-align: middle-center;
     opacity: 0;
 }
@@ -643,4 +650,43 @@
     -unity-text-align: upper-center;
     opacity: 0.6;
     margin-bottom: 10px;
+}
+
+.swatch-disabled {
+    opacity: 0.5; /* Làm mờ thẻ màu đi một nửa để báo hiệu đang bận */
+    /* Vô hiệu hóa toàn bộ sự kiện click chuột/cảm ứng vào thẻ này */
+    pointer-events: none; 
+}
+
+/* ==========================================
+   NÚT XÓA SẢN PHẨM (NẰM DƯỚI SKU)
+========================================== */
+.info-right {
+    flex-direction: column;
+    align-items: flex-end; /* Ép chữ và nút dính sát lề phải */
+}
+
+.btn-delete {
+    background-color: rgba(255, 60, 60, 0.08);
+    border-color: rgba(255, 60, 60, 0.4);
+    border-width: 1px;
+    border-radius: 6px;
+    color: rgb(255, 100, 100);
+    font-size: 24px;
+    padding: 5px 20px;
+    margin-top: 8px; /* Đẩy cách xa mã SKU ở trên ra một chút */
+    margin-right: 0; margin-bottom: 0; margin-left: 0;
+    -unity-font-style: bold;
+    transition-property: background-color, border-color, color;
+    transition-duration: 150ms;
+}
+
+.btn-delete:hover {
+    background-color: rgba(255, 60, 60, 0.2);
+    border-color: rgb(255, 60, 60);
+    color: white;
+}
+
+.btn-delete:active {
+    background-color: rgba(255, 60, 60, 0.4);
 }

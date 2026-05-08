@@ -61,51 +61,57 @@
    PRODUCT GRID & CARDS
 ════════════════════════════════════════════ */
 .product-grid {
-    flex-direction: row;
+   flex-direction: row;
     flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-evenly; /* Chia đều khoảng cách ngang 2 bên */
+    align-content: flex-start;     /* Đẩy các thẻ lên trên, tránh bị lơ lửng giữa màn hình */
     flex-grow: 1;
-    padding: 20px;
+    padding: 20px 40px;            /* Tăng lề 2 bên màn hình để không bị sát viền */
+    margin-top: 100px;
 }
 
 .product-card {
-    width: 340px;
-    height: 480px;
+    width: 44%;                    /* Dùng % để tự động co giãn (2 thẻ chiếm 88%, còn 12% làm khe hở) */
+    height: 600px;                 /* Kéo dài thẻ ra một chút để chứa nút bấm bên trong thoải mái hơn */
     background-color: rgba(10, 14, 26, 0.85);
     border-color: rgb(0, 229, 255);
     border-width: 4px;
     border-radius: 25px;
-    margin: 20px;
+    margin: 0 0 50px 0;            /* Tăng khoảng cách theo chiều dọc giữa 2 hàng lên 50px */
     padding: 25px;
     flex-direction: column;
+    margin-top: 50px;
 }
 
 .card-image-box {
     width: 100%;
-    height: 240px;
+    height: 300px;               
+    min-height: 300px; 
+    max-height: 300px;
+    
     background-color: rgb(120, 120, 120);
     border-radius: 15px;
     margin-bottom: 20px;
-    
-    /* Thêm dòng này để ảnh tự động zoom lấp đầy ô mà không bị méo */
     -unity-background-scale-mode: scale-and-crop;
 }
 
 
 .card-title {
-   font-size: 32px;
+    font-size: 32px;
     color: white;
     -unity-font-style: bold;
     
-    /* CẤU HÌNH CHO 2 DÒNG */
-    white-space: normal;      /* Cho phép rớt dòng */
-    overflow: hidden;         /* Giấu chữ thừa */
-    text-overflow: ellipsis;  /* Thêm dấu "..." (chỉ hoạt động tốt trên Unity 2022+) */
+    /* Cho phép rớt dòng và ép lề ngang */
+    white-space: normal;      
+    width: 100%;
     
-    /* Khóa cứng chiều cao (Font 32px x 2 dòng + khoảng cách ~ 80px) */
+    /* BỘ BA KHÓA CỨNG CHIỀU CAO CHO 2 DÒNG */
     height: 80px; 
-    max-height: 80px;
+    min-height: 80px; /* [QUAN TRỌNG NHẤT] Ép thẻ luôn cao 80px dù chỉ có 1 chữ */
+    max-height: 80px; 
+    
+    /* Giấu phần chữ bị lố sang dòng thứ 3 */
+    overflow: hidden;         
     
     flex-grow: 0;
     flex-shrink: 0;
@@ -121,7 +127,7 @@
     
     /* VŨ KHÍ BÍ MẬT: Tuyệt đối không cho phép khối này bị ép lùn xuống */
     flex-shrink: 0; 
-    margin-top: 10px;
+    margin-top: auto;
 }
 
 /* ════════════════════════════════════════════

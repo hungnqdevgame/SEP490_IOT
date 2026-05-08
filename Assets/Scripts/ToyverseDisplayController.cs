@@ -25,7 +25,7 @@ public class ToyverseDisplayController : MonoBehaviour
     private Coroutine _helloCoroutine;
     private Coroutine _slideshowCoroutine;
 
-    private readonly List<(VisualElement element, string sku)> _swatches = new();
+    private readonly List<(VisualElement element, string sku,double price)> _swatches = new();
 
     private IVisualElementScheduledItem _progressAnim;
     private IVisualElementScheduledItem _blinkAnim;
@@ -122,6 +122,18 @@ public class ToyverseDisplayController : MonoBehaviour
                 WebSocketManager.Instance.ReconnectWithNewUrl(inputUrl.value);
             }
         });
+        var btnDelete = _productView?.Q<Button>("btn-delete");
+        btnDelete?.RegisterCallback<ClickEvent>(e => {
+            // Xóa mô hình 3DShowIdle
+            if (modelLoader != null) modelLoader.ClearCurrentModel();
+
+            // Xóa danh sách nhạc chờ nếu đang chiếu
+            if (DataBridge.playlist != null) DataBridge.playlist.Clear();
+            if (_slideshowCoroutine != null) StopCoroutine(_slideshowCoroutine);
+
+            // Bật lại màn hình quét (Idle)
+            ShowIdle();
+        });
     }
 
     private void OnDestroy()
@@ -182,7 +194,13 @@ public class ToyverseDisplayController : MonoBehaviour
     {
         string json = JsonUtility.ToJson(playItem.fullProductData);
         ProductBarcodeData summaryData = JsonUtility.FromJson<ProductBarcodeData>(json);
-        summaryData.basePrice = playItem.fullProductData.price;
+        summaryData.price = playItem.fullProductData.price;
+        summaryData.originCountry = playItem.fullProductData.originCountry;
+        summaryData.origin = playItem.fullProductData.origin;
+        summaryData.width = playItem.fullProductData.width;
+        summaryData.length = playItem.fullProductData.length;
+        summaryData.height = playItem.fullProductData.height;
+        summaryData.weight = playItem.fullProductData.weight;
 
         string fetchUrl = "";
         if (!string.IsNullOrEmpty(summaryData.barcode))
@@ -316,12 +334,12 @@ public class ToyverseDisplayController : MonoBehaviour
         SetLabel("spec-material", data.material);
         SetLabel("spec-brand", data.brand);
         SetLabel("spec-age", data.ageRange);
-        SetLabel("spec-price", data.basePrice.ToString("N0") + " ₫");
+        SetLabel("spec-price", data.price.ToString("N0") + " ₫");
 
         SetLabel("spec-length", data.length > 0 ? $"{data.length} cm" : "—");
         SetLabel("spec-width", data.width > 0 ? $"{data.width} cm" : "—");
         SetLabel("spec-height", data.height > 0 ? $"{data.height} cm" : "—");
-        SetLabel("spec-weight", data.weight > 0 ? $"{data.weight} kg" : "—");
+        SetLabel("spec-weight", data.weight > 0 ? $"{data.weight} g" : "—");
         SetLabel("spec-battery", string.IsNullOrEmpty(data.originCountry) ? "—" : data.originCountry);
     }
 
@@ -370,15 +388,18 @@ public class ToyverseDisplayController : MonoBehaviour
                 if (selectedIndex == -1) selectedIndex = 0;
             }
 
-            SelectSwatch(_swatches[selectedIndex].element, _swatches[selectedIndex].sku);
+            // Gọi SelectSwatch cho màu mặc định đầu tiên
+            SelectSwatch(_swatches[selectedIndex].element, _swatches[selectedIndex].sku, _swatches[selectedIndex].price);
         }
         else
         {
+            // Nếu không có màu, hiển thị giá gốc của sản phẩm
+            SetLabel("spec-price", data.price.ToString("N0") + " ₫");
             OnColorSelected(data.sku);
         }
     }
 
-    private (VisualElement element, string sku) CreateSwatchElement(ProductBarcodeColor colorData)
+    private (VisualElement element, string sku,double price) CreateSwatchElement(ProductBarcodeColor colorData)
     {
         var sw = new VisualElement();
         sw.AddToClassList("swatch");
@@ -398,14 +419,22 @@ public class ToyverseDisplayController : MonoBehaviour
         sw.Add(check);
 
         string skuCapture = colorData.sku;
-        sw.RegisterCallback<ClickEvent>(_ => SelectSwatch(sw, skuCapture));
+        double priceCapture = colorData.price;
+        sw.RegisterCallback<ClickEvent>(_ => SelectSwatch(sw, skuCapture, priceCapture));
 
-        return (sw, colorData.sku);
+        return (sw, colorData.sku, priceCapture);
     }
 
-    private void SelectSwatch(VisualElement selected, string sku)
+    private void SelectSwatch(VisualElement selected, string sku,double price)
     {
-        foreach (var (el, _) in _swatches)
+        if (modelLoader != null && modelLoader.isLoading)
+        {
+            Debug.LogWarning("⏳ [HỆ THỐNG] Đang tải mô hình, không thể đổi màu lúc này!");
+            return;
+        }
+
+        SetLabel("spec-price", price > 0 ? price.ToString("N0") + " ₫" : "---");
+        foreach (var (el, _, _) in _swatches)
         {
             el.RemoveFromClassList("swatch-active");
             var chk = el.Q<Label>(className: "swatch-check");
@@ -441,6 +470,9 @@ public class ToyverseDisplayController : MonoBehaviour
         var infoPanel = _productView?.Q<VisualElement>("info-panel");
         if (infoPanel != null) infoPanel.style.display = DisplayStyle.Flex;
 
+        var btnDelete = _productView?.Q<Button>("btn-delete");
+        if (btnDelete != null) btnDelete.style.display = DisplayStyle.None;
+
         ClearTextFields();
         StartIdleAnimations();
     }
@@ -456,6 +488,9 @@ public class ToyverseDisplayController : MonoBehaviour
 
         var infoPanel = _productView?.Q<VisualElement>("info-panel");
         if (infoPanel != null) infoPanel.style.display = DisplayStyle.Flex;
+
+        var btnDelete = _productView?.Q<Button>("btn-delete");
+        if (btnDelete != null) btnDelete.style.display = DisplayStyle.Flex;
 
         ResetToOverviewTab();
         StartProductAnimations();
@@ -593,7 +628,7 @@ public class ToyverseDisplayController : MonoBehaviour
     private void SetLabel(string elementName, string value)
     {
         var el = _productView.Q<Label>(elementName);
-        if (el != null) el.text = string.IsNullOrEmpty(value) ? "—" : value;
+        if (el != null) el.text = string.IsNullOrEmpty(value) ? "—" : value.Trim();
     }
 
     private void StopAllAnimations()
@@ -628,6 +663,21 @@ public class ToyverseDisplayController : MonoBehaviour
             liveText.text = "CHƯA KẾT NỐI";
             liveDot.style.backgroundColor = new StyleColor(new Color32(255, 60, 60, 255));
             liveText.style.color = new StyleColor(new Color32(255, 60, 60, 255));
+        }
+    }
+    public void SetSwatchesInteractable(bool isInteractable)
+    {
+        // Lặp qua tất cả các thẻ màu đã lưu trong danh sách
+        foreach (var (element, _, _) in _swatches)
+        {
+            if (isInteractable)
+            {
+                element.RemoveFromClassList("swatch-disabled"); // Mở khóa
+            }
+            else
+            {
+                element.AddToClassList("swatch-disabled");      // Khóa lại
+            }
         }
     }
 }

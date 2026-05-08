@@ -37,6 +37,13 @@ public class ProductItem
     public string brand;
     public string material;
     public string ageRange;
+    public string originCountry;
+    public string origin;
+
+    public float width;
+    public float length;
+    public float height;
+    public float weight;
 }
 
 [Serializable]
@@ -133,13 +140,14 @@ public class ProductBarcodeData
     public string productCategoryId;
     public string sku;            // Lấy "R-000001"
     public string name;           // Lấy "Robot"
-    public double basePrice;
+    public double price;
     public string description;
     public string barcode;        // Lấy "1234567890"
     public string brand;
     public string material;
     public string originCountry;
     public string ageRange;
+    public string origin;
     public bool isActive;
     public string createdAt;
     public float width;
