@@ -6,4 +6,5 @@ public static class DataBridge
     public static ProductItem selectedProduct;
     public static List<ModelPlaylistItem> playlist = new List<ModelPlaylistItem>();
     public static bool isSlideshowMode = false;
+    public static List<ProductItem> selectedItemsCache = new List<ProductItem>();
 }

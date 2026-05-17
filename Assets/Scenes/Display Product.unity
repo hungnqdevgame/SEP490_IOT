@@ -119,6 +119,50 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &132900666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2164000862586942175, guid: 58a105989043090459b788e665df2367, type: 3}
+  m_PrefabInstance: {fileID: 172619478}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 132900667}
+  - component: {fileID: 132900668}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &132900667
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 941949835935038359, guid: 58a105989043090459b788e665df2367, type: 3}
+  m_PrefabInstance: {fileID: 172619478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 132900666}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 591076966}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &132900668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 5289795220231706497, guid: 58a105989043090459b788e665df2367, type: 3}
+  m_PrefabInstance: {fileID: 172619478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 132900666}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5ce66eb94eb6724d8fbc824382f397c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &172619478
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -188,9 +232,6 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 8838400851340966456, guid: 58a105989043090459b788e665df2367, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 591076962}
     - targetCorrespondingSourceObject: {fileID: 8838400851340966456, guid: 58a105989043090459b788e665df2367, type: 3}
       insertIndex: -1
       addedObject: {fileID: 591076965}
@@ -530,6 +571,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   assetName: KyleRobot
+  isLoading: 0
 --- !u!114 &471902957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -575,23 +617,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   toyAnimator: {fileID: 0}
---- !u!1 &591076961 stripped
+--- !u!1 &591076961
 GameObject:
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 8838400851340966456, guid: 58a105989043090459b788e665df2367, type: 3}
   m_PrefabInstance: {fileID: 172619478}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &591076962
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 591076961}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e2545c0f25fd06458eb6ec7fa6dfbc4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 591076966}
+  - component: {fileID: 591076965}
+  m_Layer: 0
+  m_Name: NetworkManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!114 &591076965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -605,6 +647,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serverUrl: ws://localhost:5035/ws
+--- !u!4 &591076966
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 5911793594285677181, guid: 58a105989043090459b788e665df2367, type: 3}
+  m_PrefabInstance: {fileID: 172619478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 591076961}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 444.54758, y: 141.52469, z: -4.114318}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 132900667}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &603589963 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2384574420002479693, guid: f1c1b4c6091bd6f428dbf3057ee33cd7, type: 3}

@@ -7,6 +7,7 @@
             <ui:VisualElement name="corner-tr" class="corner corner-tr" />
             <ui:VisualElement name="corner-bl" class="corner corner-bl" />
             <ui:VisualElement name="corner-br" class="corner corner-br" />
+            
             <ui:VisualElement name="idle-overlay" class="idle-overlay">
                 <ui:VisualElement name="idle-card" class="idle-card" style="padding-bottom: 50px; margin-top: 50px; margin-right: 50px; margin-bottom: 564px; margin-left: 50px;">
                     <ui:VisualElement name="idle-ring-wrap" class="idle-ring-wrap">
@@ -21,16 +22,18 @@
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
+            
             <ui:VisualElement name="hello-panel" class="hello-panel">
                 <ui:Label name="hello-text" text="Xin chào quý khách" class="hello-text" />
             </ui:VisualElement>
+            
             <ui:VisualElement name="topbar" class="topbar topbar-fixed">
                 <ui:VisualElement name="nav-group" class="nav-group">
-                    <ui:Button name="btn-home" tooltip="Quay về danh sách" class="btn-back" style="border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom-right-radius: 16px; border-bottom-left-radius: 16px;">
+                    <ui:Button name="btn-home" tooltip="Quay về danh sách" class="btn-back" style="border-radius: 16px;">
                         <ui:VisualElement class="btn-back__icon" />
-                        <ui:Label text="QUAY LẠI" class="btn-back__label" />
+                        <ui:Label  class="btn-back__label" />
                     </ui:Button>
-                    <ui:Button name="btn-settings" tooltip="Cài đặt kết nối" class="btn-icon-sq" style="margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 10px;">
+                    <ui:Button name="btn-settings" tooltip="Cài đặt kết nối" class="btn-icon-sq" style="margin: 10px;">
                         <ui:VisualElement class="btn-icon-sq__img" />
                     </ui:Button>
                 </ui:VisualElement>
@@ -39,62 +42,50 @@
                     <ui:Label name="live-text" text="ĐANG HIỂN THỊ" class="live-text" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            
             <ui:VisualElement name="info-panel" class="info-panel">
                 <ui:VisualElement name="info-row" class="info-row">
                     <ui:VisualElement name="info-left" class="info-left">
                         <ui:Label name="prod-name" text="TITAN X9" class="prod-name" />
                         <ui:Label name="prod-sub" text="Robot Điều Khiển · Series 2025" class="prod-sub" />
                     </ui:VisualElement>
-                   <ui:VisualElement name="info-right" class="info-right">
-    <ui:Label name="prod-id" text="CT-000001-BL" class="prod-id" />
-    <ui:Button name="btn-delete" text="XÓA" class="btn-delete" />
-</ui:VisualElement>
+                    <ui:VisualElement name="info-right" class="info-right">
+                      
+                        <ui:Button name="btn-delete" text="XÓA" class="btn-delete" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
+                
                 <ui:VisualElement name="tabs" class="tabs">
                     <ui:Button name="tab-overview" text="TỔNG QUAN" class="tab tab-active" />
-                    <ui:Button name="tab-specs" text="THÔNG SỐ" class="tab" />
+                    <ui:Button name="tab-specs" text="HOẠT ẢNH &amp; THÔNG SỐ" class="tab" />
                 </ui:VisualElement>
+                
                 <ui:VisualElement name="tab-content-overview" class="tab-content">
                     <ui:VisualElement name="color-section" class="color-section">
                         <ui:Label text="CHỌN MÀU ĐỂ XEM 3D" class="sec-label" />
                         <ui:VisualElement name="swatches" class="swatches">
-                            <ui:VisualElement name="sw-blue" tooltip="Xanh" class="swatch swatch-active" style="background-color: rgb(26, 74, 255);">
-                                <ui:Label text="✓" class="swatch-check" />
                             </ui:VisualElement>
-                            <ui:VisualElement name="sw-red" tooltip="Đỏ" class="swatch" style="background-color: rgb(204, 34, 34);">
-                                <ui:Label text="✓" class="swatch-check" />
-                            </ui:VisualElement>
-                            <ui:VisualElement name="sw-black" tooltip="Đen" class="swatch" style="background-color: rgb(30, 30, 30);">
-                                <ui:Label text="✓" class="swatch-check" />
-                            </ui:VisualElement>
-                            <ui:VisualElement name="sw-gold" tooltip="Vàng" class="swatch" style="background-color: rgb(200, 191, 160);">
-                                <ui:Label text="✓" class="swatch-check" />
-                            </ui:VisualElement>
-                            <ui:VisualElement name="sw-silver" tooltip="Bạc" class="swatch" style="background-color: rgb(208, 232, 208);">
-                                <ui:Label text="✓" class="swatch-check" />
-                            </ui:VisualElement>
-                        </ui:VisualElement>
                     </ui:VisualElement>
                     <ui:VisualElement name="specs-grid" class="specs-grid">
                         <ui:VisualElement name="spec-0" class="spec-chip" style="margin-right: 8px;">
                             <ui:Label text="LOẠI SẢN PHẨM" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-type" text="Robot RC" class="spec-value" style="white-space: normal;" />
+                            <ui:Label name="spec-type" text="—" class="spec-value" style="white-space: normal;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="spec-1" class="spec-chip" style="margin-right: 0;">
                             <ui:Label text="CHẤT LIỆU" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-material" text="ABS cao cấp" class="spec-value" style="white-space: normal;" />
+                            <ui:Label name="spec-material" text="—" class="spec-value" style="white-space: normal;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="spec-2" class="spec-chip" style="margin-right: 8px;">
                             <ui:Label text="HÃNG" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-brand" text="TitanToys" class="spec-value" style="white-space: normal;" />
+                            <ui:Label name="spec-brand" text="—" class="spec-value" style="white-space: normal;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="spec-3" class="spec-chip" style="margin-right: 0;">
                             <ui:Label text="TUỔI" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-age" text="6+" class="spec-value" style="white-space: normal;" />
+                            <ui:Label name="spec-age" text="—" class="spec-value" style="white-space: normal;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="spec-4" class="spec-chip" style="margin-right: 8px;">
                             <ui:Label text="GIÁ" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-price" text="420.000 ₫" class="spec-value" style="white-space: normal;" />
+                            <ui:Label name="spec-price" text="—" class="spec-value" style="white-space: normal;" />
                         </ui:VisualElement>
                         <ui:VisualElement name="spec-5" class="spec-chip" style="margin-right: 0;">
                             <ui:Label text="XUẤT XỨ" class="spec-label" style="white-space: normal;" />
@@ -102,32 +93,49 @@
                         </ui:VisualElement>
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="tab-content-specs" class="tab-content tab-content-hidden">
-                    <ui:VisualElement class="specs-grid" style="padding-top: 24px; padding-bottom: 0;">
-                        <ui:VisualElement class="spec-chip" style="margin-right: 8px;">
-                            <ui:Label text="CHIỀU DÀI" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-length" text="—" class="spec-value" style="white-space: normal;" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="spec-chip" style="margin-right: 0;">
-                            <ui:Label text="CHIỀU RỘNG" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-width" text="—" class="spec-value" style="white-space: normal;" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="spec-chip" style="margin-right: 8px;">
-                            <ui:Label text="CHIỀU CAO" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-height" text="—" class="spec-value" style="white-space: normal;" />
-                        </ui:VisualElement>
-                        <ui:VisualElement class="spec-chip" style="margin-right: 0;">
-                            <ui:Label text="TRỌNG LƯỢNG" class="spec-label" style="white-space: normal;" />
-                            <ui:Label name="spec-weight" text="—" class="spec-value" style="white-space: normal;" />
+                
+           <ui:VisualElement name="tab-content-specs" class="tab-content tab-content-hidden">
+                    
+                    <ui:VisualElement name="anim-section" class="anim-section" style="margin-top: 24px;">
+                        <ui:Label text="HOẠT ẢNH" class="sec-label" style="margin-left: 24px;" />
+                        <ui:VisualElement class="anim-grid">
+                            <ui:Button name="btn-ani1" text="Hoạt ảnh 1" class="anim-btn" />
+                            <ui:Button name="btn-ani2" text="Hoạt ảnh 2" class="anim-btn" />
+                            <ui:Button name="btn-ani3" text="Hoạt ảnh 3" class="anim-btn" />
+                            <ui:Button name="btn-ani4" text="Hoạt ảnh 4" class="anim-btn" />
                         </ui:VisualElement>
                     </ui:VisualElement>
-                    <ui:VisualElement name="features" class="features" />
+
+                    <ui:VisualElement name="dim-section" class="dim-section">
+                        <ui:Label text="THÔNG SỐ" class="sec-label" style="margin-left: 24px; margin-bottom: 0;" />
+                        
+                        <ui:VisualElement class="specs-grid" style="padding-top: 10px; padding-bottom: 24px;">
+                            <ui:VisualElement class="spec-chip spec-chip-compact" style="margin-right: 8px;">
+                                <ui:Label text="CHIỀU DÀI" class="spec-label" style="white-space: normal;" />
+                                <ui:Label name="spec-length" text="—" class="spec-value" style="white-space: normal;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="spec-chip spec-chip-compact" style="margin-right: 0;">
+                                <ui:Label text="CHIỀU RỘNG" class="spec-label" style="white-space: normal;" />
+                                <ui:Label name="spec-width" text="—" class="spec-value" style="white-space: normal;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="spec-chip spec-chip-compact" style="margin-right: 8px;">
+                                <ui:Label text="CHIỀU CAO" class="spec-label" style="white-space: normal;" />
+                                <ui:Label name="spec-height" text="—" class="spec-value" style="white-space: normal;" />
+                            </ui:VisualElement>
+                            <ui:VisualElement class="spec-chip spec-chip-compact" style="margin-right: 0;">
+                                <ui:Label text="TRỌNG LƯỢNG" class="spec-label" style="white-space: normal;" />
+                                <ui:Label name="spec-weight" text="—" class="spec-value" style="white-space: normal;" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    
                 </ui:VisualElement>
             </ui:VisualElement>
+            
             <ui:VisualElement name="settings-panel" class="settings-panel">
                 <ui:VisualElement class="settings-box">
                     <ui:Label text="CÀI ĐẶT KẾT NỐI" class="settings-title" />
-                    <ui:Label text="Đường dẫn Server SignalR:" class="settings-label" />
+                    <ui:Label text="Đường dẫn Server SignalR/WebSocket:" class="settings-label" />
                     <ui:TextField name="input-server-url" class="settings-input" />
                     <ui:VisualElement class="settings-actions">
                         <ui:Button name="btn-close-settings" text="HỦY" class="settings-btn btn-secondary" />

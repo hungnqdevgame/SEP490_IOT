@@ -19,7 +19,7 @@ public class LoadModel : MonoBehaviour
     void Awake()
     {
         // Xóa cache lúc mới mở App (phòng hờ lần trước tắt ngang)
-        ClearDiskCache("Mở App");
+    //    ClearDiskCache("Mở App");
     }
 
     void OnApplicationQuit()

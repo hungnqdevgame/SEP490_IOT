@@ -1,0 +1,12 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.0.59f2
+CRC: 1138841302
+HashAppended: 0
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: ct-000005-bl
+      Dependencies: {}
+    Info_1:
+      Name: r-000001-w
+      Dependencies: {}

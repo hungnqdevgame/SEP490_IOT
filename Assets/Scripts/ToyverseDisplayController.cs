@@ -48,6 +48,15 @@ public class ToyverseDisplayController : MonoBehaviour
         _root.style.flexGrow = 1;
         _root.style.backgroundColor = new StyleColor(Color.clear);
 
+        var btnAni1 = _productView?.Q<Button>("btn-ani1");
+        var btnAni2 = _productView?.Q<Button>("btn-ani2");
+        var btnAni3 = _productView?.Q<Button>("btn-ani3");
+        var btnAni4 = _productView?.Q<Button>("btn-ani4");
+
+        btnAni1?.RegisterCallback<ClickEvent>(e => PlayAnimation(1));
+        btnAni2?.RegisterCallback<ClickEvent>(e => PlayAnimation(2));
+        btnAni3?.RegisterCallback<ClickEvent>(e => PlayAnimation(3));
+        btnAni4?.RegisterCallback<ClickEvent>(e => PlayAnimation(4));
         ShowIdle();
 
         // ================================================================
@@ -119,6 +128,8 @@ public class ToyverseDisplayController : MonoBehaviour
             if (settingsPanel != null) settingsPanel.style.display = DisplayStyle.None;
             if (inputUrl != null && WebSocketManager.Instance != null)
             {
+                PlayerPrefs.SetString("WebSocket_URL", inputUrl.value);
+                PlayerPrefs.Save();
                 WebSocketManager.Instance.ReconnectWithNewUrl(inputUrl.value);
             }
         });
@@ -134,6 +145,7 @@ public class ToyverseDisplayController : MonoBehaviour
             // Bật lại màn hình quét (Idle)
             ShowIdle();
         });
+
     }
 
     private void OnDestroy()
@@ -645,6 +657,7 @@ public class ToyverseDisplayController : MonoBehaviour
     // ================================================================
     // CẬP NHẬT TRẠNG THÁI MẠNG LÊN UI
     // ================================================================
+    private Coroutine _autoReconnectCoroutine;
     private void UpdateConnectionUI(bool isConnected)
     {
         var liveDot = _productView?.Q<VisualElement>("live-dot");
@@ -657,12 +670,23 @@ public class ToyverseDisplayController : MonoBehaviour
             liveText.text = "ĐÃ KẾT NỐI";
             liveDot.style.backgroundColor = new StyleColor(new Color32(0, 255, 136, 255));
             liveText.style.color = new StyleColor(new Color32(0, 255, 136, 255));
+
+            if (_autoReconnectCoroutine != null)
+            {
+                StopCoroutine(_autoReconnectCoroutine);
+                _autoReconnectCoroutine = null;
+            }
         }
         else
         {
             liveText.text = "CHƯA KẾT NỐI";
             liveDot.style.backgroundColor = new StyleColor(new Color32(255, 60, 60, 255));
             liveText.style.color = new StyleColor(new Color32(255, 60, 60, 255));
+
+            if (_autoReconnectCoroutine == null && gameObject.activeInHierarchy)
+            {
+                _autoReconnectCoroutine = StartCoroutine(AutoReconnectRoutine());
+            }
         }
     }
     public void SetSwatchesInteractable(bool isInteractable)
@@ -677,6 +701,44 @@ public class ToyverseDisplayController : MonoBehaviour
             else
             {
                 element.AddToClassList("swatch-disabled");      // Khóa lại
+            }
+        }
+    }
+
+
+    // HÀM GỌI ANIMATION SANG TOYANIMATOR
+    private void PlayAnimation(int aniIndex)
+    {
+        // (Khắc phục cảnh báo màu vàng bằng cách dùng FindFirstObjectByType thay cho hàm cũ)
+        var animator = Object.FindFirstObjectByType<ToyAnimator>();
+
+        if (animator != null)
+        {
+            if (aniIndex == 1) animator.SetAni1();
+            if (aniIndex == 2) animator.SetAni2();
+            if (aniIndex == 3) animator.SetAni3();
+            if (aniIndex == 4) animator.SetAni4();
+        }
+        else
+        {
+            Debug.LogWarning("⏳ [ToyverseUI] Chưa tải mô hình 3D hoặc Mô hình không có ToyAnimator!");
+        }
+    }
+
+    private IEnumerator AutoReconnectRoutine()
+    {
+        while (true)
+        {
+            // Chờ 5 giây trước mỗi lần thử lại để không làm treo máy
+            yield return new WaitForSeconds(5f);
+
+            Debug.Log("🔄 [Auto-Reconnect] Đang tự động thử kết nối lại với Mâm xoay...");
+
+            if (WebSocketManager.Instance != null)
+            {
+                // Lấy URL gần nhất mà người dùng đã lưu để kết nối lại
+                string savedUrl = PlayerPrefs.GetString("WebSocket_URL", "ws://192.168.137.194:8765/ws");
+                WebSocketManager.Instance.ReconnectWithNewUrl(savedUrl);
             }
         }
     }

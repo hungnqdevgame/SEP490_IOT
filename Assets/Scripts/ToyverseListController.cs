@@ -32,7 +32,7 @@ public class ToyverseListController : MonoBehaviour
     private int _currentPage = 1;
     private int _maxPage = 1;
     private string _searchText = "";
-    private List<ProductItem> _selectedItems = new List<ProductItem>();
+    private List<ProductItem> _selectedItems = DataBridge.selectedItemsCache;
 
     private void OnEnable()
     {

@@ -18,7 +18,7 @@ public class CreateAssetBundles
 
         BuildPipeline.BuildAssetBundles(assetBundleDirectory,
                                         BuildAssetBundleOptions.None,
-                                        BuildTarget.Android);
+                                        BuildTarget.StandaloneWindows64);
     }
 }
 #endif

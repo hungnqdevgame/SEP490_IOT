@@ -201,20 +201,16 @@
 ════════════════════════════════════════════ */
 
 .btn-back {
-    /* Reset Unity Button defaults */
-    background-color: rgba(0, 229, 255, 0.07);
+  background-color: rgba(0, 229, 255, 0.07);
     border-color: rgba(0, 229, 255, 0.4);
     border-width: 1px;
-    border-radius: 100px;
-    padding: 0 20px 0 14px;
+    border-radius: 16px; /* Bo góc giống nút Settings */
+    width: 60px;         /* Đặt chiều rộng bằng với nút Settings */
     height: 58px;
+    padding: 0;
     margin: 0;
-
-    /* Layout children ngang */
-    flex-direction: row;
     align-items: center;
     justify-content: center;
-
     transition-property: background-color, border-color;
     transition-duration: 150ms;
     transition-timing-function: ease;
@@ -234,9 +230,9 @@
    Đặt file arrow_back.png vào Assets/UI/Icons/
 */
 .btn-back__icon {
-    width: 34px;
-    height: 34px;
-    margin-right: 10px;
+  width: 50px; height: 50px;
+    margin-right: 0; /* ĐÃ XÓA margin-right: 10px để mũi tên ra giữa nút */
+    margin-top : 10px;
     background-image: url("project://database/Assets/UI/Icons/arrow_back.png");
     -unity-background-scale-mode: scale-to-fit;
     -unity-background-image-tint-color: rgb(0, 229, 255);
@@ -390,9 +386,9 @@
 }
 
 .tab {
-    flex: 1;
+  flex: 1;
     padding: 10px;
-    font-size: 23px;
+    font-size: 20px; /* Hạ từ 23px xuống 20px để chữ không bị tràn */
     letter-spacing: 1px;
     color: rgb(58, 90, 122);
     background-color: transparent;
@@ -414,10 +410,44 @@
 
 .tab-content {
     flex-direction: column;
-    min-height: 290px;
+    min-height: 400px;
 }
 
 .tab-content-hidden { display: none; }
+.anim-section {
+    margin-top: 15px;
+}
+
+.anim-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 24px 24px;
+}
+
+.anim-btn {
+    width: 48%; /* Xếp 2 nút trên 1 hàng */
+    height: 65px;
+    background-color: rgba(0, 229, 255, 0.05);
+    border-color: rgba(0, 229, 255, 0.3);
+    border-width: 1.5px;
+    border-radius: 10px;
+    color: rgb(232, 244, 255);
+    font-size: 22px;
+    -unity-font-style: bold;
+    margin: 0 0 12px 0;
+    padding: 0;
+    transition-duration: 150ms;
+}
+
+.anim-btn:hover {
+    background-color: rgba(0, 229, 255, 0.15);
+    border-color: rgb(0, 229, 255);
+}
+
+.anim-btn:active {
+    background-color: rgba(0, 229, 255, 0.3);
+}
 
 /* ════════════════════════════════════════════
    COLOR SWATCHES
@@ -427,7 +457,7 @@
 
 .sec-label {
     font-size: 24px;
-    color: rgb(58, 90, 122);
+   color: rgb(0, 229, 255);
     letter-spacing: 2px;
     margin-bottom: 10px;
 }
@@ -491,7 +521,7 @@
 
 .spec-label {
     font-size: 25px;
-    color: rgb(58, 90, 122);
+   color: rgb(150, 200, 255);
     margin-bottom: 4px;
     letter-spacing: 0.5px;
     white-space: normal;
@@ -663,22 +693,22 @@
 ========================================== */
 .info-right {
     flex-direction: column;
-    align-items: flex-end; /* Ép chữ và nút dính sát lề phải */
+    align-items: center; /* Ép chữ và nút dính sát lề phải */
 }
 
 .btn-delete {
     background-color: rgba(255, 60, 60, 0.08);
     border-color: rgba(255, 60, 60, 0.4);
-    border-width: 1px;
-    border-radius: 6px;
-    color: rgb(255, 100, 100);
-    font-size: 24px;
-    padding: 5px 20px;
-    margin-top: 8px; /* Đẩy cách xa mã SKU ở trên ra một chút */
-    margin-right: 0; margin-bottom: 0; margin-left: 0;
+    border-width: 2px;         /* Viền dày hơn */
+    border-radius: 12px;       /* Bo tròn hơn */
+    color: rgb(255, 100, 100); 
+    font-size: 32px;           /* Chữ to lên (cũ là 24px) */
+    padding: 12px 35px;        /* Khung bự ra */
+    margin: 0;                 /* Căn giữa đều */
     -unity-font-style: bold;
-    transition-property: background-color, border-color, color;
+    transition-property: background-color, border-color, color; 
     transition-duration: 150ms;
+    margin-top: 12px;            /* Cách xa SKU một chút */
 }
 
 .btn-delete:hover {
@@ -689,4 +719,17 @@
 
 .btn-delete:active {
     background-color: rgba(255, 60, 60, 0.4);
+}
+
+    .spec-chip-compact {
+    padding: 8px 12px; /* Giảm khoảng cách viền trong (padding) để ô lùn lại */
+    margin-bottom: 8px; /* Giảm khoảng cách giữa 2 hàng */
+}
+
+.spec-chip-compact .spec-label {
+    font-size: 20px; /* Thu nhỏ chữ tiêu đề (Chiều dài, Chiều rộng) */
+}
+
+.spec-chip-compact .spec-value {
+    font-size: 22px; /* Thu nhỏ chữ thông số (25 cm, 100 g) */
 }
